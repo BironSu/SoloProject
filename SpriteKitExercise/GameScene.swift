@@ -21,15 +21,19 @@ enum NodesZPosition: CGFloat {
 }
 class GameScene: SKScene, SKPhysicsContactDelegate {
     var velocityMultiplier: CGFloat = 0.12
+    var heroDirection: CGFloat = 0.0
+    var heroPosition = CGPoint.zero
     let displaySize: CGRect = UIScreen.main.bounds
     //MARK: Adding Objects
     lazy var player: SKSpriteNode = {
        let sprite = SKSpriteNode(imageNamed: "survivor-idle_handgun_0")
         sprite.position = CGPoint.zero
         sprite.zPosition = NodesZPosition.hero.rawValue
-        sprite.setScale(3)
+        sprite.zRotation = 1.5
+        sprite.setScale(0.3)
         return sprite
     }()
+    
     lazy var background: SKSpriteNode = {
         let sprite = SKSpriteNode(imageNamed: "Grass_Background_cropped")
         sprite.position = CGPoint.zero
@@ -42,11 +46,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         js.position = CGPoint(x: -displaySize.width/3.5, y: -displaySize.height/3)
         return js
     }()
-    lazy var swordButton: SKSpriteNode = {
-       let sprite = SKSpriteNode(imageNamed: "sword")
-            sprite.setScale(0.03)
-            sprite.position = CGPoint(x: displaySize.width/3 , y: -displaySize.height/3)
+    lazy var shootButton: SKSpriteNode = {
+       let sprite = SKSpriteNode(imageNamed: "pistolButton")
+            sprite.setScale(0.8)
+            sprite.position = CGPoint(x: displaySize.width/3 , y: -displaySize.height/4)
             sprite.zPosition = NodesZPosition.joystick.rawValue
+        return sprite
+    }()
+    lazy var meleeButton: SKSpriteNode = {
+        let sprite = SKSpriteNode(imageNamed: "Knife")
+        sprite.setScale(0.15)
+        sprite.position = CGPoint(x: displaySize.width/3 , y: -displaySize.height/2.5)
+        sprite.zPosition = NodesZPosition.joystick.rawValue
         return sprite
     }()
     var lastDirection = "Down"
@@ -60,9 +71,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     let swipeDownRec = UISwipeGestureRecognizer()
     let tapRec = UITapGestureRecognizer()
     
+    private func characterIdle() {
+        player.removeAllActions()
+        let playerIdle = SKAction(named: "PlayerIdle")!
+        player.run(SKAction.repeatForever(playerIdle))
+    }
+    private func characterWalk() {
+        player.removeAllActions()
+        let playerWalk = SKAction(named: "PlayerWalking")!
+        player.run(SKAction.repeatForever(playerWalk))
+    }
     override func didMove(to view: SKView) {
         setupNode()
         setupJoyStick()
+        characterIdle()
         //setupSwipeMovement()
         self.physicsWorld.contactDelegate = self
         self.physicsWorld.gravity = CGVector.init(dx: 1, dy: 0)
@@ -86,14 +108,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         anchorPoint = CGPoint(x: 0.5, y: 0.5)
         addChild(background)
         addChild(player)
-        addChild(swordButton)
+        addChild(shootButton)
+        addChild(meleeButton)
     }
     private func setupJoyStick() {
         addChild(analogJoystick)
         analogJoystick.trackingHandler = { [unowned self] data in
             self.player.position = CGPoint(x: self.player.position.x + (data.velocity.x * self.velocityMultiplier), y: self.player.position.y + (data.velocity.y * self.velocityMultiplier))
-            print(self.player.position)
-            self.player.zRotation = data.angular
+            self.player.zRotation = data.angular + 1.5
+            self.heroDirection = self.player.zRotation
+            self.heroPosition = self.player.position
         }
     }
     // SWIPE MOVEMENTS
@@ -193,9 +217,35 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
         player.run(SKAction.group([wait, walkAnimation, moveAction, finish, wait]))
     }
-    func attackAnimation(direction: String) {
-        let attackAnimations: SKAction = SKAction(named: "Attack\(direction)", duration: 1)!
-        player.run(attackAnimations)
+    func meleeAttack() {
+        let meleeAttackAnimation: SKAction = SKAction(named: "MeleeAttack", duration: 1)!
+        player.run(meleeAttackAnimation)
+    }
+    func shootAttack(direction: CGFloat, position: CGPoint) {
+        player.removeAllActions()
+        let shootAttackAnimation: SKAction = SKAction(named: "ShootAttack", duration: 0.5)!
+//            lazy var bullet: SKSpriteNode = {
+//                let sprite = SKSpriteNode(imageNamed: "Coin")
+//                sprite.position = player.position
+//                sprite.zPosition = NodesZPosition.hero.rawValue
+//                sprite.setScale(2)
+//                return sprite
+//            }()
+        let bullet = SKSpriteNode(imageNamed: "Coin")
+        bullet.setScale(2)
+        bullet.position = position
+        bullet.zPosition = player.zPosition
+        bullet.zRotation = player.zRotation
+        
+        let action = SKAction.move(to: CGPoint(x: 1000 * cos(bullet.zRotation) + bullet.position.x, y: 1000 * sin(bullet.zRotation) + bullet.position.y), duration: 0.8)
+        let actionDone = SKAction.removeFromParent()
+        bullet.run(SKAction.sequence([action,actionDone]))
+        bullet.physicsBody = SKPhysicsBody(rectangleOf: bullet.size)
+        bullet.physicsBody?.affectedByGravity = false
+        bullet.physicsBody?.isDynamic = false
+        addChild(bullet)
+        player.run(shootAttackAnimation)
+        characterIdle()
     }
     
     func touchDown(atPoint pos : CGPoint) {
@@ -209,10 +259,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         for t in touches {
+            
             self.touchDown(atPoint: t.location(in: self))
-            print("Hi")
-            if swordButton.contains(t.location(in: self)) {
-                attackAnimation(direction: lastDirection)
+            if shootButton.contains(t.location(in: self)) {
+                shootAttack(direction: heroDirection, position: heroPosition)
+            }
+            if meleeButton.contains(t.location(in: self)) {
+                meleeAttack()
             }
         }
     }
