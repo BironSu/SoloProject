@@ -29,6 +29,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
        let sprite = SKSpriteNode(imageNamed: "survivor-idle_handgun_0")
         sprite.position = CGPoint.zero
         sprite.zPosition = NodesZPosition.hero.rawValue
+        sprite.physicsBody?.categoryBitMask = BodyType.player.rawValue
+        sprite.physicsBody?.contactTestBitMask = BodyType.enemy.rawValue
+        sprite.physicsBody?.collisionBitMask = 0
         sprite.zRotation = 1.5
         sprite.setScale(0.3)
         return sprite
@@ -90,7 +93,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         zombie.physicsBody?.isDynamic = true
         zombie.physicsBody?.affectedByGravity = false
         zombie.physicsBody?.categoryBitMask = BodyType.enemy.rawValue
-        zombie.physicsBody?.contactTestBitMask = 1
+        zombie.physicsBody?.contactTestBitMask = BodyType.bullet.rawValue
         zombie.physicsBody?.collisionBitMask = 0
         zombie.zRotation = 1.5
         zombie.setScale(0.3)
@@ -100,12 +103,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addChild(zombie)
     }
     override func didMove(to view: SKView) {
-        self.physicsWorld.contactDelegate = self
         setupBorder()
         setupNode()
         setupJoyStick()
         characterIdle()
         //setupSwipeMovement()
+        self.physicsWorld.contactDelegate = self
         self.physicsWorld.gravity = CGVector.init(dx: 1, dy: 0)
         
         for possibleChest in self.children {
@@ -286,7 +289,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     //MARK: Physics Contacts
     func didBegin(_ contact: SKPhysicsContact) {
-        print("hi")
+        
         if (contact.bodyA.categoryBitMask == BodyType.enemy.rawValue && contact.bodyB.categoryBitMask == BodyType.bullet.rawValue) {
             print("Zombie hit")
 
