@@ -31,12 +31,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
        let sprite = SKSpriteNode(imageNamed: "survivor-idle_handgun_0")
         sprite.position = CGPoint.zero
         sprite.zPosition = NodesZPosition.hero.rawValue
-        sprite.physicsBody = SKPhysicsBody(rectangleOf: sprite.frame.size)
+        sprite.physicsBody = SKPhysicsBody(rectangleOf: sprite.size)
         sprite.physicsBody?.usesPreciseCollisionDetection = true
         sprite.physicsBody?.affectedByGravity = false
         sprite.physicsBody?.categoryBitMask = BodyType.player.rawValue
         sprite.physicsBody?.contactTestBitMask = BodyType.enemy.rawValue
-        sprite.physicsBody?.collisionBitMask = 0
+        sprite.physicsBody?.collisionBitMask = BodyType.enemy.rawValue
         sprite.zRotation = 1.5
         sprite.setScale(0.3)
         return sprite
@@ -102,7 +102,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         zombie.physicsBody?.affectedByGravity = false
         zombie.physicsBody?.categoryBitMask = BodyType.enemy.rawValue
         zombie.physicsBody?.contactTestBitMask = BodyType.bullet.rawValue
-        zombie.physicsBody?.collisionBitMask = 0
+        zombie.physicsBody?.collisionBitMask = BodyType.player.rawValue
         zombie.zRotation = 1.5
         zombie.setScale(0.3)
         let followPlayer = SKAction.move(to: player.position, duration: 2)
