@@ -13,6 +13,8 @@ enum BodyType: UInt32 {
     case player = 1
     case bullet = 2
     case enemy = 4
+    case playerHit = 8
+    case zombieHit = 16
 }
 enum NodesZPosition: CGFloat {
     case background, hero, joystick, enemy
@@ -29,6 +31,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
        let sprite = SKSpriteNode(imageNamed: "survivor-idle_handgun_0")
         sprite.position = CGPoint.zero
         sprite.zPosition = NodesZPosition.hero.rawValue
+        sprite.physicsBody = SKPhysicsBody(rectangleOf: sprite.frame.size)
+        sprite.physicsBody?.usesPreciseCollisionDetection = true
+        sprite.physicsBody?.affectedByGravity = false
         sprite.physicsBody?.categoryBitMask = BodyType.player.rawValue
         sprite.physicsBody?.contactTestBitMask = BodyType.enemy.rawValue
         sprite.physicsBody?.collisionBitMask = 0
@@ -89,7 +94,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         zombie.position = CGPoint.zero
         zombie.zPosition = NodesZPosition.enemy.rawValue
-        zombie.physicsBody = SKPhysicsBody(circleOfRadius: 7)
+        zombie.physicsBody = SKPhysicsBody(rectangleOf: zombie.frame.size)
+//        let presetTexture = SKTexture(imageNamed: "skeleton-idle_0.png")
+//        zombie.physicsBody = SKPhysicsBody(texture: presetTexture, size: presetTexture.size())
+        zombie.physicsBody?.usesPreciseCollisionDetection = true
         zombie.physicsBody?.isDynamic = true
         zombie.physicsBody?.affectedByGravity = false
         zombie.physicsBody?.categoryBitMask = BodyType.enemy.rawValue
@@ -289,12 +297,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     //MARK: Physics Contacts
     func didBegin(_ contact: SKPhysicsContact) {
-        
+        print("test")
         if (contact.bodyA.categoryBitMask == BodyType.enemy.rawValue && contact.bodyB.categoryBitMask == BodyType.bullet.rawValue) {
             print("Zombie hit")
 
         } else if (contact.bodyB.categoryBitMask == BodyType.enemy.rawValue && contact.bodyA.categoryBitMask == BodyType.bullet.rawValue) {
             print("Zombie hit but 2nd line")
+        }
+        if (contact.bodyA.categoryBitMask == BodyType.player.rawValue && contact.bodyB.categoryBitMask == BodyType.enemy.rawValue) {
+            print("Human hit")
+            
+        } else if (contact.bodyB.categoryBitMask == BodyType.enemy.rawValue && contact.bodyA.categoryBitMask == BodyType.player.rawValue) {
+            print("Human hit but 2nd line")
         }
     }
 }
