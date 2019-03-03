@@ -11,19 +11,19 @@ import GameplayKit
 
 enum BodyType: UInt32 {
     case player = 1
-    case tree = 2
-    case wall = 4
-    case chest = 8
-    case enemy = 16
+    case bullet = 2
+    case enemy = 4
 }
 enum NodesZPosition: CGFloat {
-    case background, hero, joystick
+    case background, hero, joystick, enemy
 }
 class GameScene: SKScene, SKPhysicsContactDelegate {
     var velocityMultiplier: CGFloat = 0.12
     var heroDirection: CGFloat = 0.0
     var heroPosition = CGPoint.zero
+    
     let displaySize: CGRect = UIScreen.main.bounds
+    
     //MARK: Adding Objects
     lazy var player: SKSpriteNode = {
        let sprite = SKSpriteNode(imageNamed: "survivor-idle_handgun_0")
@@ -35,7 +35,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }()
     
     lazy var background: SKSpriteNode = {
-        let sprite = SKSpriteNode(imageNamed: "Grass_Background_cropped")
+        let sprite = SKSpriteNode(imageNamed: "PostApocalypticMap")
         sprite.position = CGPoint.zero
         sprite.zPosition = NodesZPosition.background.rawValue
         sprite.setScale(2)
@@ -81,18 +81,37 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let playerWalk = SKAction(named: "PlayerWalking")!
         player.run(SKAction.repeatForever(playerWalk))
     }
+    private func spawnZombie() {
+        let zombie = SKSpriteNode(imageNamed: "skeleton-idle_0")
+        
+        zombie.position = CGPoint.zero
+        zombie.zPosition = NodesZPosition.enemy.rawValue
+        zombie.physicsBody = SKPhysicsBody(circleOfRadius: 7)
+        zombie.physicsBody?.isDynamic = true
+        zombie.physicsBody?.affectedByGravity = false
+        zombie.physicsBody?.categoryBitMask = BodyType.enemy.rawValue
+        zombie.physicsBody?.contactTestBitMask = 1
+        zombie.physicsBody?.collisionBitMask = 0
+        zombie.zRotation = 1.5
+        zombie.setScale(0.3)
+        let followPlayer = SKAction.move(to: player.position, duration: 2)
+        zombie.run(followPlayer)
+        
+        addChild(zombie)
+    }
     override func didMove(to view: SKView) {
+        self.physicsWorld.contactDelegate = self
+        setupBorder()
         setupNode()
         setupJoyStick()
         characterIdle()
         //setupSwipeMovement()
-        self.physicsWorld.contactDelegate = self
         self.physicsWorld.gravity = CGVector.init(dx: 1, dy: 0)
         
         for possibleChest in self.children {
             if (possibleChest.name == "Chest") {
                 if (possibleChest is SKSpriteNode) {
-                    possibleChest.physicsBody?.categoryBitMask = BodyType.chest.rawValue
+//                    possibleChest.physicsBody?.categoryBitMask = BodyType.chest.rawValue
                     print("found chest")
                 }
             }
@@ -103,7 +122,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
     }
     //MARK: Adding Objects
-
+    private func setupBorder() {
+//        var barra = SKSpriteNode(color: SKColor.black, size: CGSize(width: 10, height: 10))
+//        barra.position = CGPoint(x: self.frame.midX/2, y: self.frame.midY/2)
+//        barra.zPosition = 9
+//        self.addChild(barra)
+    }
     private func setupNode() {
         anchorPoint = CGPoint(x: 0.5, y: 0.5)
         addChild(background)
@@ -145,26 +169,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         tapRec.numberOfTapsRequired = 3
         self.view!.addGestureRecognizer(tapRec)
     }
-    private func setupChest() {
-        for possibleChest in self.children {
-            if (possibleChest.name == "Chest") {
-                if (possibleChest is SKSpriteNode) {
-                    possibleChest.physicsBody?.categoryBitMask = BodyType.chest.rawValue
-                    possibleChest.zPosition = 1
-                    print("found chest")
-                }
-            }
-        }
-    }
-    private func setupTree() {
-        
-    }
-    private func setupRock() {
-        
-    }
-    private func setupEnemy() {
-        
-    }
+
     //MARK: ================== Gesture Recognizers
     @objc func tappedView() {
         print("Tapped Three Times")
@@ -220,21 +225,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func meleeAttack() {
         let meleeAttackAnimation: SKAction = SKAction(named: "MeleeAttack", duration: 1)!
         player.run(meleeAttackAnimation)
+        spawnZombie()
     }
     func shootAttack(direction: CGFloat, position: CGPoint) {
         player.removeAllActions()
         let shootAttackAnimation: SKAction = SKAction(named: "ShootAttack", duration: 0.5)!
-//            lazy var bullet: SKSpriteNode = {
-//                let sprite = SKSpriteNode(imageNamed: "Coin")
-//                sprite.position = player.position
-//                sprite.zPosition = NodesZPosition.hero.rawValue
-//                sprite.setScale(2)
-//                return sprite
-//            }()
         let bullet = SKSpriteNode(imageNamed: "Coin")
         bullet.setScale(2)
         bullet.position = position
-        bullet.zPosition = player.zPosition
+        bullet.zPosition = NodesZPosition.enemy.rawValue
         bullet.zRotation = player.zRotation
         
         let action = SKAction.move(to: CGPoint(x: 1000 * cos(bullet.zRotation) + bullet.position.x, y: 1000 * sin(bullet.zRotation) + bullet.position.y), duration: 0.8)
@@ -243,8 +242,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         bullet.physicsBody = SKPhysicsBody(rectangleOf: bullet.size)
         bullet.physicsBody?.affectedByGravity = false
         bullet.physicsBody?.isDynamic = false
-        addChild(bullet)
+        bullet.physicsBody?.categoryBitMask = BodyType.bullet.rawValue
+        bullet.physicsBody?.contactTestBitMask = 1
+        bullet.physicsBody?.collisionBitMask = 0
         player.run(shootAttackAnimation)
+        addChild(bullet)
         characterIdle()
     }
     
@@ -284,11 +286,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     //MARK: Physics Contacts
     func didBegin(_ contact: SKPhysicsContact) {
-        if (contact.bodyA.categoryBitMask == BodyType.player.rawValue && contact.bodyB.categoryBitMask == BodyType.chest.rawValue) {
-            print("hit chest")
-            
-        } else if (contact.bodyB.categoryBitMask == BodyType.player.rawValue && contact.bodyA.categoryBitMask == BodyType.chest.rawValue) {
-            print("hit chest")
+        print("hi")
+        if (contact.bodyA.categoryBitMask == BodyType.enemy.rawValue && contact.bodyB.categoryBitMask == BodyType.bullet.rawValue) {
+            print("Zombie hit")
+
+        } else if (contact.bodyB.categoryBitMask == BodyType.enemy.rawValue && contact.bodyA.categoryBitMask == BodyType.bullet.rawValue) {
+            print("Zombie hit but 2nd line")
         }
     }
 }

@@ -7,26 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		935075B822272165000D5389 /* Tree_trunk.png in Resources */ = {isa = PBXBuildFile; fileRef = 935074B522272164000D5389 /* Tree_trunk.png */; };
-		935075B922272165000D5389 /* Tree_top.png in Resources */ = {isa = PBXBuildFile; fileRef = 935074B622272164000D5389 /* Tree_top.png */; };
-		935075BA22272165000D5389 /* Tree.png in Resources */ = {isa = PBXBuildFile; fileRef = 935074B722272164000D5389 /* Tree.png */; };
-		935075BB22272165000D5389 /* Rock.png in Resources */ = {isa = PBXBuildFile; fileRef = 935074B822272164000D5389 /* Rock.png */; };
-		935075BC22272165000D5389 /* Chest.png in Resources */ = {isa = PBXBuildFile; fileRef = 935074B922272164000D5389 /* Chest.png */; };
-		935075BD22272165000D5389 /* Sign.png in Resources */ = {isa = PBXBuildFile; fileRef = 935074BA22272164000D5389 /* Sign.png */; };
-		935075BE22272165000D5389 /* Grass.png in Resources */ = {isa = PBXBuildFile; fileRef = 935074BB22272164000D5389 /* Grass.png */; };
-		935075BF22272165000D5389 /* Chest (5).png in Resources */ = {isa = PBXBuildFile; fileRef = 935074BD22272164000D5389 /* Chest (5).png */; };
-		935075C022272165000D5389 /* Chest (4).png in Resources */ = {isa = PBXBuildFile; fileRef = 935074BE22272164000D5389 /* Chest (4).png */; };
-		935075C122272165000D5389 /* Chest (3).png in Resources */ = {isa = PBXBuildFile; fileRef = 935074BF22272164000D5389 /* Chest (3).png */; };
-		935075C222272165000D5389 /* Chest (2).png in Resources */ = {isa = PBXBuildFile; fileRef = 935074C022272164000D5389 /* Chest (2).png */; };
-		935075C322272165000D5389 /* Chest (1).png in Resources */ = {isa = PBXBuildFile; fileRef = 935074C122272164000D5389 /* Chest (1).png */; };
-		935075C422272165000D5389 /* Chest (6).png in Resources */ = {isa = PBXBuildFile; fileRef = 935074C222272164000D5389 /* Chest (6).png */; };
-		935075C522272165000D5389 /* Bush.png in Resources */ = {isa = PBXBuildFile; fileRef = 935074C322272164000D5389 /* Bush.png */; };
-		935075C622272165000D5389 /* Blue_orb.png in Resources */ = {isa = PBXBuildFile; fileRef = 935074C422272164000D5389 /* Blue_orb.png */; };
-		935075C722272165000D5389 /* Red_orb.png in Resources */ = {isa = PBXBuildFile; fileRef = 935074C522272164000D5389 /* Red_orb.png */; };
-		935075C822272165000D5389 /* Heart.png in Resources */ = {isa = PBXBuildFile; fileRef = 935074C622272164000D5389 /* Heart.png */; };
 		935075C922272165000D5389 /* Coin.png in Resources */ = {isa = PBXBuildFile; fileRef = 935074C722272164000D5389 /* Coin.png */; };
-		935075CA22272165000D5389 /* Green_orb.png in Resources */ = {isa = PBXBuildFile; fileRef = 935074C822272164000D5389 /* Green_orb.png */; };
-		9350F5E4222843C00066AF96 /* Grass_Background_cropped.png in Resources */ = {isa = PBXBuildFile; fileRef = 9350F5E3222843C00066AF96 /* Grass_Background_cropped.png */; };
 		9350F5E8222997900066AF96 /* AnalogJoystick.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9350F5E7222997900066AF96 /* AnalogJoystick.swift */; };
 		937E73132208AAB400ABC0F9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937E73122208AAB400ABC0F9 /* AppDelegate.swift */; };
 		937E73152208AAB400ABC0F9 /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 937E73142208AAB400ABC0F9 /* GameScene.sks */; };
@@ -38,26 +19,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		935074B522272164000D5389 /* Tree_trunk.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Tree_trunk.png; sourceTree = "<group>"; };
-		935074B622272164000D5389 /* Tree_top.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Tree_top.png; sourceTree = "<group>"; };
-		935074B722272164000D5389 /* Tree.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Tree.png; sourceTree = "<group>"; };
-		935074B822272164000D5389 /* Rock.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Rock.png; sourceTree = "<group>"; };
-		935074B922272164000D5389 /* Chest.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Chest.png; sourceTree = "<group>"; };
-		935074BA22272164000D5389 /* Sign.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Sign.png; sourceTree = "<group>"; };
-		935074BB22272164000D5389 /* Grass.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Grass.png; sourceTree = "<group>"; };
-		935074BD22272164000D5389 /* Chest (5).png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Chest (5).png"; sourceTree = "<group>"; };
-		935074BE22272164000D5389 /* Chest (4).png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Chest (4).png"; sourceTree = "<group>"; };
-		935074BF22272164000D5389 /* Chest (3).png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Chest (3).png"; sourceTree = "<group>"; };
-		935074C022272164000D5389 /* Chest (2).png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Chest (2).png"; sourceTree = "<group>"; };
-		935074C122272164000D5389 /* Chest (1).png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Chest (1).png"; sourceTree = "<group>"; };
-		935074C222272164000D5389 /* Chest (6).png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Chest (6).png"; sourceTree = "<group>"; };
-		935074C322272164000D5389 /* Bush.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Bush.png; sourceTree = "<group>"; };
-		935074C422272164000D5389 /* Blue_orb.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Blue_orb.png; sourceTree = "<group>"; };
-		935074C522272164000D5389 /* Red_orb.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Red_orb.png; sourceTree = "<group>"; };
-		935074C622272164000D5389 /* Heart.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Heart.png; sourceTree = "<group>"; };
 		935074C722272164000D5389 /* Coin.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Coin.png; sourceTree = "<group>"; };
-		935074C822272164000D5389 /* Green_orb.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Green_orb.png; sourceTree = "<group>"; };
-		9350F5E3222843C00066AF96 /* Grass_Background_cropped.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Grass_Background_cropped.png; sourceTree = "<group>"; };
 		9350F5E7222997900066AF96 /* AnalogJoystick.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalogJoystick.swift; sourceTree = "<group>"; };
 		937E730F2208AAB400ABC0F9 /* SpriteKitExercise.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SpriteKitExercise.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		937E73122208AAB400ABC0F9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -84,68 +46,9 @@
 		9350739222272100000D5389 /* Images */ = {
 			isa = PBXGroup;
 			children = (
-				9350739322272164000D5389 /* Tiny Adventure Pack */,
+				935074C722272164000D5389 /* Coin.png */,
 			);
 			path = Images;
-			sourceTree = "<group>";
-		};
-		9350739322272164000D5389 /* Tiny Adventure Pack */ = {
-			isa = PBXGroup;
-			children = (
-				9350F5E3222843C00066AF96 /* Grass_Background_cropped.png */,
-				935074B222272164000D5389 /* Other */,
-			);
-			path = "Tiny Adventure Pack";
-			sourceTree = "<group>";
-		};
-		935074B222272164000D5389 /* Other */ = {
-			isa = PBXGroup;
-			children = (
-				935074B322272164000D5389 /* Misc */,
-				935074C422272164000D5389 /* Blue_orb.png */,
-				935074C522272164000D5389 /* Red_orb.png */,
-				935074C622272164000D5389 /* Heart.png */,
-				935074C722272164000D5389 /* Coin.png */,
-				935074C822272164000D5389 /* Green_orb.png */,
-			);
-			path = Other;
-			sourceTree = "<group>";
-		};
-		935074B322272164000D5389 /* Misc */ = {
-			isa = PBXGroup;
-			children = (
-				935074B422272164000D5389 /* Tree */,
-				935074B822272164000D5389 /* Rock.png */,
-				935074B922272164000D5389 /* Chest.png */,
-				935074BA22272164000D5389 /* Sign.png */,
-				935074BB22272164000D5389 /* Grass.png */,
-				935074BC22272164000D5389 /* Chest */,
-				935074C322272164000D5389 /* Bush.png */,
-			);
-			path = Misc;
-			sourceTree = "<group>";
-		};
-		935074B422272164000D5389 /* Tree */ = {
-			isa = PBXGroup;
-			children = (
-				935074B522272164000D5389 /* Tree_trunk.png */,
-				935074B622272164000D5389 /* Tree_top.png */,
-				935074B722272164000D5389 /* Tree.png */,
-			);
-			path = Tree;
-			sourceTree = "<group>";
-		};
-		935074BC22272164000D5389 /* Chest */ = {
-			isa = PBXGroup;
-			children = (
-				935074BD22272164000D5389 /* Chest (5).png */,
-				935074BE22272164000D5389 /* Chest (4).png */,
-				935074BF22272164000D5389 /* Chest (3).png */,
-				935074C022272164000D5389 /* Chest (2).png */,
-				935074C122272164000D5389 /* Chest (1).png */,
-				935074C222272164000D5389 /* Chest (6).png */,
-			);
-			path = Chest;
 			sourceTree = "<group>";
 		};
 		937E73062208AAB400ABC0F9 = {
@@ -239,30 +142,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				935075CA22272165000D5389 /* Green_orb.png in Resources */,
-				935075C322272165000D5389 /* Chest (1).png in Resources */,
-				935075BB22272165000D5389 /* Rock.png in Resources */,
-				935075C222272165000D5389 /* Chest (2).png in Resources */,
-				935075C522272165000D5389 /* Bush.png in Resources */,
-				935075BF22272165000D5389 /* Chest (5).png in Resources */,
-				935075C422272165000D5389 /* Chest (6).png in Resources */,
-				935075C022272165000D5389 /* Chest (4).png in Resources */,
-				935075C722272165000D5389 /* Red_orb.png in Resources */,
 				937E73152208AAB400ABC0F9 /* GameScene.sks in Resources */,
-				935075BD22272165000D5389 /* Sign.png in Resources */,
 				937E73202208AAB600ABC0F9 /* Assets.xcassets in Resources */,
 				937E73232208AAB600ABC0F9 /* LaunchScreen.storyboard in Resources */,
-				935075BE22272165000D5389 /* Grass.png in Resources */,
-				935075BC22272165000D5389 /* Chest.png in Resources */,
-				935075B922272165000D5389 /* Tree_top.png in Resources */,
-				935075B822272165000D5389 /* Tree_trunk.png in Resources */,
-				935075C122272165000D5389 /* Chest (3).png in Resources */,
 				937E73172208AAB400ABC0F9 /* Actions.sks in Resources */,
-				9350F5E4222843C00066AF96 /* Grass_Background_cropped.png in Resources */,
 				935075C922272165000D5389 /* Coin.png in Resources */,
-				935075C622272165000D5389 /* Blue_orb.png in Resources */,
-				935075C822272165000D5389 /* Heart.png in Resources */,
-				935075BA22272165000D5389 /* Tree.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
