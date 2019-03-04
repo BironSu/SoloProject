@@ -25,7 +25,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var heroPosition = CGPoint.zero
     
     let displaySize: CGRect = UIScreen.main.bounds
-    
+    var gameSpace: CGRect
+    var enemies = [SKSpriteNode]()
+    override init(size: CGSize) {
+        let maxRatio: CGFloat = 16.0/9.0
+        let gameWidth = size.height/maxRatio
+        let gameSide = (size.width - gameWidth) / 2
+        
+        gameSpace = CGRect(x: gameSide, y: 0, width: gameWidth, height: size.height)
+        super.init(size: size)
+    }
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     //MARK: Adding Objects
     lazy var player: SKSpriteNode = {
        let sprite = SKSpriteNode(imageNamed: "survivor-idle_handgun_0")
@@ -93,6 +105,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let zombie = SKSpriteNode(imageNamed: "skeleton-idle_0")
         
         zombie.position = CGPoint.zero
+        zombie.name = "Zombie"
         zombie.zPosition = NodesZPosition.enemy.rawValue
         zombie.physicsBody = SKPhysicsBody(rectangleOf: zombie.frame.size)
 //        let presetTexture = SKTexture(imageNamed: "skeleton-idle_0.png")
@@ -102,14 +115,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         zombie.physicsBody?.affectedByGravity = false
         zombie.physicsBody?.categoryBitMask = BodyType.enemy.rawValue
         zombie.physicsBody?.contactTestBitMask = BodyType.bullet.rawValue
-        zombie.physicsBody?.collisionBitMask = BodyType.player.rawValue
+        zombie.physicsBody?.collisionBitMask = BodyType.player.rawValue | BodyType.enemy.rawValue
         zombie.zRotation = 1.5
         zombie.setScale(0.3)
-        let followPlayer = SKAction.move(to: player.position, duration: 2)
-        zombie.run(followPlayer)
-        
+//        let followPlayer = SKAction.move(to: player.position, duration: 5)
+//        zombie.run(followPlayer)
+        enemies.append(zombie)
         addChild(zombie)
     }
+    
     override func didMove(to view: SKView) {
         setupBorder()
         setupNode()
@@ -212,13 +226,26 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     override func update(_ currentTime: TimeInterval) {
-//        for node in self.children {
-//            if (node.name == "Chest") {
-//                if (node.position.y > player.position.y) {
-//                    node.zPosition = -100
-//                }
-//            }
-//        }
+
+        let location = player.position
+        for node in self.children {
+            if (node.name == "Zombie") {
+                
+                //Aim
+                let dx = (location.x) - node.position.x
+                let dy = (location.y) - node.position.y
+                let angle = atan2(dy, dx)
+                
+                node.zRotation = angle
+                
+                //Seek
+                let velocityX =  cos(angle) * 1
+                let velocityY =  sin(angle) * 1
+                
+                node.position.x += velocityX
+                node.position.y += velocityY
+            }
+        }
     }
     func move(theXAmount: CGFloat, theYAmount: CGFloat, theAnimation: String){
         player.physicsBody?.affectedByGravity = true
@@ -236,7 +263,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func meleeAttack() {
         let meleeAttackAnimation: SKAction = SKAction(named: "MeleeAttack", duration: 1)!
         player.run(meleeAttackAnimation)
-        spawnZombie()
+        if enemies.isEmpty {
+            spawnZombie()
+        }
     }
     func shootAttack(direction: CGFloat, position: CGPoint) {
         player.removeAllActions()
@@ -297,15 +326,25 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     //MARK: Physics Contacts
     func didBegin(_ contact: SKPhysicsContact) {
-        print("test")
+//        var bodyOne = SKPhysicsBody()
+//        var bodyTwo = SKPhysicsBody()
         if (contact.bodyA.categoryBitMask == BodyType.enemy.rawValue && contact.bodyB.categoryBitMask == BodyType.bullet.rawValue) {
+            contact.bodyA.node?.removeFromParent()
+            contact.bodyB.node?.removeFromParent()
             print("Zombie hit")
-
+            enemies.removeAll()
         } else if (contact.bodyB.categoryBitMask == BodyType.enemy.rawValue && contact.bodyA.categoryBitMask == BodyType.bullet.rawValue) {
+            contact.bodyA.node?.removeFromParent()
+            contact.bodyB.node?.removeFromParent()
             print("Zombie hit but 2nd line")
+            enemies.removeAll()
         }
         if (contact.bodyA.categoryBitMask == BodyType.player.rawValue && contact.bodyB.categoryBitMask == BodyType.enemy.rawValue) {
             print("Human hit")
+            let zombieAttack: SKAction = SKAction(named: "ZombieAttack", duration: 1)!
+            let attackDelay: SKAction = SKAction.wait(forDuration: 3)
+            contact.bodyB.node?.run(SKAction.sequence([zombieAttack,attackDelay]))
+//            contact.bodyB.node?.run(zombieAttack)
             
         } else if (contact.bodyB.categoryBitMask == BodyType.enemy.rawValue && contact.bodyA.categoryBitMask == BodyType.player.rawValue) {
             print("Human hit but 2nd line")
