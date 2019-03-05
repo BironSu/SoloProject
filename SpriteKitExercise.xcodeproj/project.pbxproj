@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		935075C922272165000D5389 /* Coin.png in Resources */ = {isa = PBXBuildFile; fileRef = 935074C722272164000D5389 /* Coin.png */; };
 		9350F5E8222997900066AF96 /* AnalogJoystick.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9350F5E7222997900066AF96 /* AnalogJoystick.swift */; };
 		937E73132208AAB400ABC0F9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937E73122208AAB400ABC0F9 /* AppDelegate.swift */; };
 		937E73152208AAB400ABC0F9 /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 937E73142208AAB400ABC0F9 /* GameScene.sks */; };
@@ -19,7 +18,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		935074C722272164000D5389 /* Coin.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Coin.png; sourceTree = "<group>"; };
 		9350F5E7222997900066AF96 /* AnalogJoystick.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalogJoystick.swift; sourceTree = "<group>"; };
 		937E730F2208AAB400ABC0F9 /* SpriteKitExercise.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SpriteKitExercise.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		937E73122208AAB400ABC0F9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -46,7 +44,6 @@
 		9350739222272100000D5389 /* Images */ = {
 			isa = PBXGroup;
 			children = (
-				935074C722272164000D5389 /* Coin.png */,
 			);
 			path = Images;
 			sourceTree = "<group>";
@@ -146,7 +143,6 @@
 				937E73202208AAB600ABC0F9 /* Assets.xcassets in Resources */,
 				937E73232208AAB600ABC0F9 /* LaunchScreen.storyboard in Resources */,
 				937E73172208AAB400ABC0F9 /* Actions.sks in Resources */,
-				935075C922272165000D5389 /* Coin.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

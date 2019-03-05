@@ -17,7 +17,7 @@ enum BodyType: UInt32 {
     case zombieHit = 16
 }
 enum NodesZPosition: CGFloat {
-    case background, bullet, hero, joystick, enemy
+    case background, bullet, hero, enemy, joystick
 }
 class GameScene: SKScene, SKPhysicsContactDelegate {
     var velocityMultiplier: CGFloat = 0.12
@@ -28,6 +28,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var gameSpace: CGRect
     var timer = Timer()
     var enemies = [SKSpriteNode]()
+    var turrets: SKSpriteNode?
     override init(size: CGSize) {
         let maxRatio: CGFloat = 16.0/9.0
         let gameWidth = size.height/maxRatio
@@ -65,21 +66,26 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }()
     lazy var analogJoystick: AnalogJoystick = {
        let js = AnalogJoystick(diameter: 100, colors: nil, images: (substrate: UIImage(named: "jSubstrate"), stick: UIImage(named: "jStick")))
-        js.position = CGPoint(x: -displaySize.width/3.5, y: -displaySize.height/3)
+        js.position = CGPoint(x: -displaySize.width/3.5, y: displaySize.height/2.75)
+        js.zPosition = NodesZPosition.joystick.rawValue
+        js.alpha = 0.5
         return js
     }()
     lazy var shootButton: SKSpriteNode = {
        let sprite = SKSpriteNode(imageNamed: "pistolButton")
-            sprite.setScale(0.8)
-            sprite.position = CGPoint(x: displaySize.width/3 , y: -displaySize.height/4)
-            sprite.zPosition = NodesZPosition.joystick.rawValue
+        sprite.setScale(0.6)
+        sprite.zRotation = 4.75
+        sprite.position = CGPoint(x: -displaySize.width/4 , y: -displaySize.height/2.4)
+        sprite.zPosition = NodesZPosition.joystick.rawValue
+        sprite.alpha = 1
         return sprite
     }()
     lazy var meleeButton: SKSpriteNode = {
         let sprite = SKSpriteNode(imageNamed: "Knife")
-        sprite.setScale(0.15)
-        sprite.position = CGPoint(x: displaySize.width/3 , y: -displaySize.height/2.5)
+        sprite.setScale(0.1)
+        sprite.position = CGPoint(x: -displaySize.width/2.5 , y: -displaySize.height/3.5)
         sprite.zPosition = NodesZPosition.joystick.rawValue
+        sprite.alpha = 1
         return sprite
     }()
     //MARK: Declare Object Settings
@@ -154,8 +160,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         setupNode()
         setupJoyStick()
         characterIdle()
-        //zombieAttackTimer()
-        
         //setupSwipeMovement()
         self.physicsWorld.contactDelegate = self
         self.physicsWorld.gravity = CGVector.init(dx: 1, dy: 0)
@@ -184,19 +188,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     
-    // TAP GESTURE
-    private func setupTapGesture() {
-        tapRec.addTarget(self, action: #selector(GameScene.tappedView))
-        tapRec.numberOfTouchesRequired = 2
-        tapRec.numberOfTapsRequired = 3
-        self.view!.addGestureRecognizer(tapRec)
-    }
-
-    //MARK: ================== Gesture Recognizers
-    @objc func tappedView() {
-        print("Tapped Three Times")
-    }
-    
     func cleanUp() {
         // only need to call when presenting a different scene class
         for gesture in (self.view?.gestureRecognizers)! {
@@ -205,7 +196,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     override func update(_ currentTime: TimeInterval) {
         if enemies.count < 3 {
-            spawnZombie()
+            //spawnZombie()
         }
         zombieAttack()
         if self.player.position.x > self.gameSpace.maxX - self.player.size.width * 3.5{
@@ -259,7 +250,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         for t in touches {
-            
+            if (turrets == nil) {
+                let turret = SKSpriteNode(imageNamed: "turret")
+                turret.position.x = t.location(in: self).x
+                turret.position.y = t.location(in: self).y
+                turret.zPosition = NodesZPosition.hero.rawValue
+                turrets = turret
+                addChild(turret)
+            }
             self.touchDown(atPoint: t.location(in: self))
             if shootButton.contains(t.location(in: self)) {
                 shootAttack(direction: heroDirection, position: heroPosition)
@@ -312,5 +310,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         } else if (contact.bodyB.categoryBitMask == BodyType.enemy.rawValue && contact.bodyA.categoryBitMask == BodyType.player.rawValue) {
             print("Human hit but 2nd line")
         }
+    }
+}
+
+extension SKSpriteNode {
+    func drawBorder(color: UIColor, width: CGFloat) {
+        let shapeNode = SKShapeNode(rect: frame)
+        shapeNode.fillColor = .clear
+        shapeNode.strokeColor = color
+        shapeNode.lineWidth = width
+        addChild(shapeNode)
     }
 }
