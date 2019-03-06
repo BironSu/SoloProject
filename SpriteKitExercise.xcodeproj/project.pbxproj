@@ -15,6 +15,7 @@
 		937E731B2208AAB400ABC0F9 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937E731A2208AAB400ABC0F9 /* GameViewController.swift */; };
 		937E73202208AAB600ABC0F9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 937E731F2208AAB600ABC0F9 /* Assets.xcassets */; };
 		937E73232208AAB600ABC0F9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 937E73212208AAB600ABC0F9 /* LaunchScreen.storyboard */; };
+		93D26DFC222EE62400181DE3 /* Turret.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93D26DFB222EE62400181DE3 /* Turret.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 		937E731F2208AAB600ABC0F9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		937E73222208AAB600ABC0F9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		937E73242208AAB600ABC0F9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		93D26DFB222EE62400181DE3 /* Turret.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Turret.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,6 +73,7 @@
 				937E73142208AAB400ABC0F9 /* GameScene.sks */,
 				937E73162208AAB400ABC0F9 /* Actions.sks */,
 				937E73182208AAB400ABC0F9 /* GameScene.swift */,
+				93D26DFB222EE62400181DE3 /* Turret.swift */,
 				9350F5E7222997900066AF96 /* AnalogJoystick.swift */,
 				937E731A2208AAB400ABC0F9 /* GameViewController.swift */,
 				937E731F2208AAB600ABC0F9 /* Assets.xcassets */,
@@ -153,6 +156,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				93D26DFC222EE62400181DE3 /* Turret.swift in Sources */,
 				937E73192208AAB400ABC0F9 /* GameScene.swift in Sources */,
 				9350F5E8222997900066AF96 /* AnalogJoystick.swift in Sources */,
 				937E731B2208AAB400ABC0F9 /* GameViewController.swift in Sources */,
