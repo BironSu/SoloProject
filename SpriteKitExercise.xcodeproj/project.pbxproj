@@ -16,6 +16,7 @@
 		937E73202208AAB600ABC0F9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 937E731F2208AAB600ABC0F9 /* Assets.xcassets */; };
 		937E73232208AAB600ABC0F9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 937E73212208AAB600ABC0F9 /* LaunchScreen.storyboard */; };
 		93D26DFC222EE62400181DE3 /* Turret.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93D26DFB222EE62400181DE3 /* Turret.swift */; };
+		93D26DFE2231AC5600181DE3 /* shader1.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 93D26DFD2231AC5600181DE3 /* shader1.fsh */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +31,7 @@
 		937E73222208AAB600ABC0F9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		937E73242208AAB600ABC0F9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		93D26DFB222EE62400181DE3 /* Turret.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Turret.swift; sourceTree = "<group>"; };
+		93D26DFD2231AC5600181DE3 /* shader1.fsh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader1.fsh; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,6 +75,7 @@
 				937E73142208AAB400ABC0F9 /* GameScene.sks */,
 				937E73162208AAB400ABC0F9 /* Actions.sks */,
 				937E73182208AAB400ABC0F9 /* GameScene.swift */,
+				93D26DFD2231AC5600181DE3 /* shader1.fsh */,
 				93D26DFB222EE62400181DE3 /* Turret.swift */,
 				9350F5E7222997900066AF96 /* AnalogJoystick.swift */,
 				937E731A2208AAB400ABC0F9 /* GameViewController.swift */,
@@ -145,6 +148,7 @@
 				937E73152208AAB400ABC0F9 /* GameScene.sks in Resources */,
 				937E73202208AAB600ABC0F9 /* Assets.xcassets in Resources */,
 				937E73232208AAB600ABC0F9 /* LaunchScreen.storyboard in Resources */,
+				93D26DFE2231AC5600181DE3 /* shader1.fsh in Resources */,
 				937E73172208AAB400ABC0F9 /* Actions.sks in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
