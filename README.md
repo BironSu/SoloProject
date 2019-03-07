@@ -22,6 +22,7 @@ Landmine
 
 ## Features
  Control the player with an analog joystick.
+ 
  Button to shoot(far-range attack), melee(close-range attack) and use landmine
  
 ## Requirements
@@ -29,7 +30,11 @@ Hard coded for iPhone 7 Plus.
 
 ## Future Implementations
  Better zombie spawn locations (Currently spawns only from 1 corner randomly)
+ 
  Add score
+ 
  Add turret (Auto targets closest zombie)
+ 
  Add boss zombie
+ 
  Add grenade (Drag and drop) 
