@@ -30,8 +30,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var enemies = [SKSpriteNode]()
     var zombieCounter = 0
     var turrets: SKSpriteNode?
-    let maxZombie = 2
-    var playerLife = 5
+    let maxZombie = 1
+    var zombieCanAttackPlayer = true
+    var zombieMissileCanHitPlayer = true
+//    var playerLife = 5
     override init(size: CGSize) {
         let maxRatio: CGFloat = 16.0/9.0
         let gameWidth = size.height/maxRatio
@@ -58,7 +60,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         sprite.physicsBody?.contactTestBitMask = BodyType.enemy.rawValue
         sprite.physicsBody?.collisionBitMask = BodyType.enemy.rawValue | BodyType.zombieHit.rawValue
         sprite.physicsBody?.isDynamic = true
-        sprite.physicsBody?.restitution = 100
         sprite.zRotation = 1.5
         sprite.setScale(0.3)
         return sprite
@@ -141,7 +142,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addChild(zombie)
     }
     private func zombieAttackTimer() {
-        timer = Timer.scheduledTimer(timeInterval: 3, target: self, selector: #selector(zombieAttack), userInfo: nil, repeats: true)
+        timer = Timer.scheduledTimer(timeInterval: 2, target: self, selector: #selector(attackPlayerTrue), userInfo: nil, repeats: false)
+    }
+    @objc func attackPlayerTrue() {
+        zombieCanAttackPlayer = true
+    }
+    private func zombieMissileTimer() {
+        timer = Timer.scheduledTimer(timeInterval: 2, target: self, selector: #selector(zombieMissileTrue), userInfo: nil, repeats: false)
+    }
+    @objc func zombieMissileTrue() {
+        zombieMissileCanHitPlayer = true
     }
     @objc func zombieAttack() {
         let location = player.position
@@ -380,14 +390,32 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 
         
         if (contact.bodyA.categoryBitMask == BodyType.player.rawValue && contact.bodyB.categoryBitMask == BodyType.enemy.rawValue) {
-            zombieAttackProjectile(zombieNode: contact.bodyB.node!)
+            // Add timer to prevent spam
+            if zombieCanAttackPlayer {
+                zombieAttackProjectile(zombieNode: contact.bodyB.node!)
+                zombieCanAttackPlayer = false
+                zombieAttackTimer()
+            }
         } else if (contact.bodyA.categoryBitMask == BodyType.enemy.rawValue && contact.bodyB.categoryBitMask == BodyType.player.rawValue) {
-            zombieAttackProjectile(zombieNode: contact.bodyA.node!)
+            // Add timer to prevent spam
+            if zombieCanAttackPlayer {
+                zombieAttackProjectile(zombieNode: contact.bodyA.node!)
+                zombieCanAttackPlayer = false
+                zombieAttackTimer()
+            }
         }
         if (contact.bodyA.categoryBitMask == BodyType.player.rawValue && contact.bodyB.categoryBitMask == BodyType.zombieHit.rawValue) {
-            print("Human hit")
+            if zombieMissileCanHitPlayer {
+                print("Human hit")
+                zombieMissileCanHitPlayer = false
+                zombieMissileTimer()
+            }
         } else if (contact.bodyA.categoryBitMask == BodyType.zombieHit.rawValue && contact.bodyB.categoryBitMask == BodyType.player.rawValue) {
-            print("Human hit but 2nd line")
+            if zombieMissileCanHitPlayer {
+                print("Human hit but 2nd line")
+                zombieMissileCanHitPlayer = false
+                zombieMissileTimer()
+            }
         }
         if (contact.bodyA.categoryBitMask == BodyType.playerHit.rawValue && contact.bodyB.categoryBitMask == BodyType.zombieHit.rawValue) {
             print("Counter!")
