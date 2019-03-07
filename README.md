@@ -5,6 +5,7 @@ ZombieShooter is a top-down shooter that spawns random zombies that targets the 
 ## Gifs
 
 Movements
+
 ![zombieshootermovements](https://user-images.githubusercontent.com/7001720/53983314-ee862280-40e4-11e9-99b2-768fe69870ad.gif)
 
 Player Attacks
@@ -12,6 +13,7 @@ Player Attacks
 
 Zombie Attacks
 
+![zombieshooterzombieattack](https://user-images.githubusercontent.com/7001720/53983714-dc58b400-40e5-11e9-8c0e-902c25b1320e.gif)
 
 Landmine
 
