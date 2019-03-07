@@ -10,6 +10,7 @@ Movements
 
 Player Attacks
 
+![zombieshooteractions](https://user-images.githubusercontent.com/7001720/53983778-fdb9a000-40e5-11e9-94d2-64a554a1a75e.gif)
 
 Zombie Attacks
 
