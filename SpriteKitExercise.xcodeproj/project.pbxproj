@@ -17,6 +17,14 @@
 		937E73232208AAB600ABC0F9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 937E73212208AAB600ABC0F9 /* LaunchScreen.storyboard */; };
 		93D26DFC222EE62400181DE3 /* Turret.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93D26DFB222EE62400181DE3 /* Turret.swift */; };
 		93D26DFE2231AC5600181DE3 /* shader1.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 93D26DFD2231AC5600181DE3 /* shader1.fsh */; };
+		93D26E042232F99900181DE3 /* ZombieSpawn.wav in Resources */ = {isa = PBXBuildFile; fileRef = 93D26DFF2232F99900181DE3 /* ZombieSpawn.wav */; };
+		93D26E052232F99900181DE3 /* ZombieDeath.wav in Resources */ = {isa = PBXBuildFile; fileRef = 93D26E002232F99900181DE3 /* ZombieDeath.wav */; };
+		93D26E062232F99900181DE3 /* Explosion.flac in Resources */ = {isa = PBXBuildFile; fileRef = 93D26E012232F99900181DE3 /* Explosion.flac */; };
+		93D26E072232F99900181DE3 /* GunShot.flac in Resources */ = {isa = PBXBuildFile; fileRef = 93D26E022232F99900181DE3 /* GunShot.flac */; };
+		93D26E082232F99900181DE3 /* ZombieAttack.wav in Resources */ = {isa = PBXBuildFile; fileRef = 93D26E032232F99900181DE3 /* ZombieAttack.wav */; };
+		93D26E0A2232FB5D00181DE3 /* PlayerDeath.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 93D26E092232FB5D00181DE3 /* PlayerDeath.mp3 */; };
+		93D26E112233024B00181DE3 /* Knife.wav in Resources */ = {isa = PBXBuildFile; fileRef = 93D26E102233024B00181DE3 /* Knife.wav */; };
+		93D26E13223303D100181DE3 /* PlayerHit.wav in Resources */ = {isa = PBXBuildFile; fileRef = 93D26E12223303D100181DE3 /* PlayerHit.wav */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +40,14 @@
 		937E73242208AAB600ABC0F9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		93D26DFB222EE62400181DE3 /* Turret.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Turret.swift; sourceTree = "<group>"; };
 		93D26DFD2231AC5600181DE3 /* shader1.fsh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader1.fsh; sourceTree = "<group>"; };
+		93D26DFF2232F99900181DE3 /* ZombieSpawn.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = ZombieSpawn.wav; sourceTree = "<group>"; };
+		93D26E002232F99900181DE3 /* ZombieDeath.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = ZombieDeath.wav; sourceTree = "<group>"; };
+		93D26E012232F99900181DE3 /* Explosion.flac */ = {isa = PBXFileReference; lastKnownFileType = file; path = Explosion.flac; sourceTree = "<group>"; };
+		93D26E022232F99900181DE3 /* GunShot.flac */ = {isa = PBXFileReference; lastKnownFileType = file; path = GunShot.flac; sourceTree = "<group>"; };
+		93D26E032232F99900181DE3 /* ZombieAttack.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = ZombieAttack.wav; sourceTree = "<group>"; };
+		93D26E092232FB5D00181DE3 /* PlayerDeath.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = PlayerDeath.mp3; sourceTree = "<group>"; };
+		93D26E102233024B00181DE3 /* Knife.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = Knife.wav; sourceTree = "<group>"; };
+		93D26E12223303D100181DE3 /* PlayerHit.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = PlayerHit.wav; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -45,11 +61,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		9350739222272100000D5389 /* Images */ = {
+		9350739222272100000D5389 /* Sounds */ = {
 			isa = PBXGroup;
 			children = (
+				93D26E012232F99900181DE3 /* Explosion.flac */,
+				93D26E022232F99900181DE3 /* GunShot.flac */,
+				93D26E102233024B00181DE3 /* Knife.wav */,
+				93D26E12223303D100181DE3 /* PlayerHit.wav */,
+				93D26E092232FB5D00181DE3 /* PlayerDeath.mp3 */,
+				93D26E032232F99900181DE3 /* ZombieAttack.wav */,
+				93D26E002232F99900181DE3 /* ZombieDeath.wav */,
+				93D26DFF2232F99900181DE3 /* ZombieSpawn.wav */,
 			);
-			path = Images;
+			path = Sounds;
 			sourceTree = "<group>";
 		};
 		937E73062208AAB400ABC0F9 = {
@@ -80,7 +104,7 @@
 				9350F5E7222997900066AF96 /* AnalogJoystick.swift */,
 				937E731A2208AAB400ABC0F9 /* GameViewController.swift */,
 				937E731F2208AAB600ABC0F9 /* Assets.xcassets */,
-				9350739222272100000D5389 /* Images */,
+				9350739222272100000D5389 /* Sounds */,
 				937E73212208AAB600ABC0F9 /* LaunchScreen.storyboard */,
 				937E73242208AAB600ABC0F9 /* Info.plist */,
 			);
@@ -145,7 +169,15 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				93D26E0A2232FB5D00181DE3 /* PlayerDeath.mp3 in Resources */,
+				93D26E082232F99900181DE3 /* ZombieAttack.wav in Resources */,
+				93D26E112233024B00181DE3 /* Knife.wav in Resources */,
+				93D26E042232F99900181DE3 /* ZombieSpawn.wav in Resources */,
+				93D26E052232F99900181DE3 /* ZombieDeath.wav in Resources */,
 				937E73152208AAB400ABC0F9 /* GameScene.sks in Resources */,
+				93D26E062232F99900181DE3 /* Explosion.flac in Resources */,
+				93D26E072232F99900181DE3 /* GunShot.flac in Resources */,
+				93D26E13223303D100181DE3 /* PlayerHit.wav in Resources */,
 				937E73202208AAB600ABC0F9 /* Assets.xcassets in Resources */,
 				937E73232208AAB600ABC0F9 /* LaunchScreen.storyboard in Resources */,
 				93D26DFE2231AC5600181DE3 /* shader1.fsh in Resources */,

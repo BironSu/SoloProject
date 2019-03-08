@@ -34,8 +34,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     let maxZombie = 5
     var zombieCanAttackPlayer = true
     var zombieMissileCanHitPlayer = true
+    var playerCanAttack = true
+    var playerCanShoot = true
     var explosion = true
-//    var playerLife = 5
+    var playerLife = 200
     override init(size: CGSize) {
         let maxRatio: CGFloat = 16.0/9.0
         let gameWidth = size.height/maxRatio
@@ -48,6 +50,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         fatalError("init(coder:) has not been implemented")
     }
     //MARK: Adding Objects
+    lazy var healthBar: SKSpriteNode = {
+        let sprite = SKSpriteNode(color:SKColor.yellow, size: CGSize(width: 30, height: playerLife))
+        sprite.alpha = 0.75
+        sprite.anchorPoint = CGPoint(x: 0.5, y: 0.0)
+        sprite.zRotation = 3.14
+        sprite.position = CGPoint(x: displaySize.width/2.5, y: displaySize.height/2.15)
+        sprite.zPosition = NodesZPosition.joystick.rawValue
+        return sprite
+    }()
     lazy var player: SKSpriteNode = {
        let sprite = SKSpriteNode(imageNamed: "survivor-idle_handgun_0")
         sprite.position = CGPoint.zero
@@ -159,25 +170,40 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         zombie.setScale(0.2)
         enemies.append(zombie)
         zombieCounter += 1
-        
+        run(SKAction.playSoundFileNamed("ZombieSpawn", waitForCompletion: false))
         addChild(zombie)
     }
+    
+    //MARK: Delays
     private func zombieAttackTimer() {
         timer = Timer.scheduledTimer(timeInterval: 2, target: self, selector: #selector(attackPlayerTrue), userInfo: nil, repeats: false)
     }
     @objc func attackPlayerTrue() {
         zombieCanAttackPlayer = true
     }
+    
     private func zombieMissileTimer() {
         timer = Timer.scheduledTimer(timeInterval: 2, target: self, selector: #selector(zombieMissileTrue), userInfo: nil, repeats: false)
     }
     @objc func zombieMissileTrue() {
         zombieMissileCanHitPlayer = true
     }
+    private func playerShootTimer() {
+        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(playerShootTrue), userInfo: nil, repeats: false)
+    }
+    @objc func playerShootTrue() {
+        playerCanShoot = true
+    }
+    private func playerAttackTimer() {
+        timer = Timer.scheduledTimer(timeInterval: 2, target: self, selector: #selector(playerAttackTrue), userInfo: nil, repeats: false)
+    }
+    @objc func playerAttackTrue() {
+        playerCanAttack = true
+    }
     @objc func zombieAttack() {
         let location = player.position
         for node in enemies {
-            let followPlayer = SKAction.move(to: player.position, duration: 1)
+            let followPlayer = SKAction.move(to: player.position, duration: 3)
             node.run(followPlayer)
             //Aim
             let dx = (location.x) - node.position.x
@@ -195,6 +221,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     override func didMove(to view: SKView) {
+
         setupNode()
         setupJoyStick()
         characterIdle()
@@ -215,6 +242,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addChild(player)
         addChild(shootButton)
         addChild(meleeButton)
+        addChild(healthBar)
         addChild(landmineButton)
     }
     private func setupJoyStick() {
@@ -229,6 +257,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         if enemies.count < maxZombie {
             spawnZombie()
         }
+        healthBar.size.height = CGFloat(playerLife)
         zombieAttack()
         if self.player.position.x > self.gameSpace.maxX - self.player.size.width * 4.25{
             self.player.position.x = self.gameSpace.maxX - self.player.size.width * 4.25
@@ -267,6 +296,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         melee.physicsBody?.categoryBitMask = BodyType.playerHit.rawValue
         melee.physicsBody?.contactTestBitMask = BodyType.enemy.rawValue | BodyType.zombieHit.rawValue
         melee.physicsBody?.collisionBitMask = BodyType.enemy.rawValue | BodyType.zombieHit.rawValue
+        run(SKAction.playSoundFileNamed("Knife.wav", waitForCompletion: false))
         addChild(melee)
     }
     func shootAttack() {
@@ -288,6 +318,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         bullet.physicsBody?.categoryBitMask = BodyType.bullet.rawValue
         bullet.physicsBody?.contactTestBitMask = BodyType.enemy.rawValue
         bullet.physicsBody?.collisionBitMask = BodyType.enemy.rawValue
+        run(SKAction.playSoundFileNamed("GunShot.flac", waitForCompletion: false))
         player.run(shootAttackAnimation)
         addChild(bullet)
         characterIdle()
@@ -322,6 +353,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         explosion.physicsBody?.collisionBitMask = BodyType.enemy.rawValue
         explosion.physicsBody?.affectedByGravity = false
         explosion.physicsBody?.isDynamic = false
+        run(SKAction.playSoundFileNamed("Explosion.flac", waitForCompletion: false))
         addChild(explosion)
         let scale = SKAction.scale(by: 7, duration: 0.2)
         let fadeOut = SKAction.fadeOut(withDuration: 0.5)
@@ -358,6 +390,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         melee.physicsBody?.categoryBitMask = BodyType.zombieHit.rawValue
         melee.physicsBody?.contactTestBitMask = BodyType.player.rawValue | BodyType.playerHit.rawValue
         melee.physicsBody?.collisionBitMask = BodyType.player.rawValue | BodyType.playerHit.rawValue
+        run(SKAction.playSoundFileNamed("ZombieAttack", waitForCompletion: false))
+
         addChild(melee)
     }
     
@@ -382,10 +416,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             }
             self.touchDown(atPoint: t.location(in: self))
             if shootButton.contains(t.location(in: self)) {
-                shootAttack()
+                if playerCanShoot {
+                    shootAttack()
+                    playerCanShoot = false
+                    playerShootTimer()
+                }
             }
             if meleeButton.contains(t.location(in: self)) {
-                meleeAttack()
+                if playerCanAttack {
+                    meleeAttack()
+                    playerCanAttack = false
+                    playerAttackTimer()
+                }
             }
             if landmineButton.contains(t.location(in: self)) {
                 if landmines > 0 {
@@ -425,6 +467,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 contact.bodyA.node?.removeFromParent()
                 contact.bodyB.node?.removeFromParent()
                 print("Zombie hit")
+                run(SKAction.playSoundFileNamed("ZombieDeath", waitForCompletion: false))
                 enemies.remove(at: index)
             }
         } else if (contact.bodyB.categoryBitMask == BodyType.enemy.rawValue && contact.bodyA.categoryBitMask == BodyType.bullet.rawValue) {
@@ -432,19 +475,25 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 contact.bodyA.node?.removeFromParent()
                 contact.bodyB.node?.removeFromParent()
                 print("Zombie hit")
+                run(SKAction.playSoundFileNamed("ZombieDeath", waitForCompletion: false))
                 enemies.remove(at: index)
             }
         }
         if (contact.bodyA.categoryBitMask == BodyType.enemy.rawValue && contact.bodyB.categoryBitMask == BodyType.playerHit.rawValue) {
             if let index = enemies.index(where: {$0.name == contact.bodyA.node?.name}) {
                 contact.bodyA.node?.removeFromParent()
+                contact.bodyB.node?.removeFromParent()
                 print("Zombie hit")
+                run(SKAction.playSoundFileNamed("ZombieDeath", waitForCompletion: false))
+
                 enemies.remove(at: index)
             }
         } else if (contact.bodyB.categoryBitMask == BodyType.enemy.rawValue && contact.bodyA.categoryBitMask == BodyType.playerHit.rawValue) {
             if let index = enemies.index(where: {$0.name == contact.bodyB.node?.name}) {
                 contact.bodyB.node?.removeFromParent()
+                contact.bodyA.node?.removeFromParent()
                 print("Zombie hit")
+                run(SKAction.playSoundFileNamed("ZombieDeath", waitForCompletion: false))
                 enemies.remove(at: index)
             }
         }
@@ -468,12 +517,26 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         if (contact.bodyA.categoryBitMask == BodyType.player.rawValue && contact.bodyB.categoryBitMask == BodyType.zombieHit.rawValue) {
             if zombieMissileCanHitPlayer {
                 print("Human hit")
+                run(SKAction.playSoundFileNamed("PlayerHit.wav", waitForCompletion: false))
+                playerLife -= 20
+                if playerLife <= 0 {
+                    contact.bodyA.node?.removeFromParent()
+                    run(SKAction.playSoundFileNamed("PlayerDeath.mp3", waitForCompletion: false))
+
+                    self.view?.scene?.isUserInteractionEnabled = false
+                }
                 zombieMissileCanHitPlayer = false
                 zombieMissileTimer()
             }
         } else if (contact.bodyA.categoryBitMask == BodyType.zombieHit.rawValue && contact.bodyB.categoryBitMask == BodyType.player.rawValue) {
             if zombieMissileCanHitPlayer {
                 print("Human hit but 2nd line")
+                playerLife -= 20
+                if playerLife <= 0 {
+                    contact.bodyB.node?.removeFromParent()
+                    run(SKAction.playSoundFileNamed("PlayerHit.wav", waitForCompletion: false))
+                    self.view?.scene?.isUserInteractionEnabled = false
+                }
                 zombieMissileCanHitPlayer = false
                 zombieMissileTimer()
             }
