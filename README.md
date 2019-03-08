@@ -29,7 +29,6 @@ Landmine
 Hard coded for iPhone 7 Plus.
 
 ## Future Implementations
- Better zombie spawn locations (Currently spawns only from 1 corner randomly)
  
  Add score
  
