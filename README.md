@@ -37,3 +37,5 @@ Hard coded for iPhone 7 Plus.
  Add boss zombie
  
  Add grenade (Drag and drop) 
+
+Update Gifs!
