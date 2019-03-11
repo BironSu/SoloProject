@@ -23,7 +23,11 @@ Game Over
 ## Features
  Control the player with an analog joystick.
  
- Button to shoot(far-range attack), melee(close-range attack) and use landmine
+ Button to shoot(far-range attack), melee(close-range attack) and use landmine.
+ 
+ Restart button for new game when health bar is depleted.
+ 
+ Sound added.
  
 ## Requirements
 Hard coded for iPhone 7 Plus.
@@ -37,5 +41,3 @@ Hard coded for iPhone 7 Plus.
  Add boss zombie
  
  Add grenade (Drag and drop) 
-
-Update Gifs!
