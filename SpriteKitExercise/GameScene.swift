@@ -19,7 +19,7 @@ enum BodyType: UInt32 {
     case explosion = 64
 }
 enum NodesZPosition: CGFloat {
-    case background,landmine, bullet, playerMelee, hero, enemy, enemyMelee, joystick
+    case background,landmine, bullet, playerMelee, hero, enemy, enemyMelee, joystick , pauseMenuBackground, pauseMenuButton
 }
 class GameScene: SKScene, SKPhysicsContactDelegate {
     var velocityMultiplier: CGFloat = 0.06
@@ -30,14 +30,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var zombieCounter = 0
     var turrets: SKSpriteNode?
     var landmines = 1
-    let maxZombie = 5
     var zombieCanAttackPlayer = true
     var zombieMissileCanHitPlayer = true
     var playerCanAttack = true
     var playerCanShoot = true
     var explosion = true
     var gameOverStatus = false
-    var playerLife = 100
+    var gamePause = false
+    var playerScore = 0
+    var playerLife = 200
     override init(size: CGSize) {
         let maxRatio: CGFloat = 16.0/9.0
         let gameWidth = size.height/maxRatio
@@ -54,10 +55,54 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let sprite = SKSpriteNode(color:SKColor.yellow, size: CGSize(width: 30, height: playerLife))
         sprite.alpha = 0.75
         sprite.anchorPoint = CGPoint(x: 0.5, y: 0.0)
-        sprite.zRotation = 3.14
+        sprite.zRotation = 3.14159
         sprite.position = CGPoint(x: displaySize.width/2.5, y: displaySize.height/2.15)
         sprite.zPosition = NodesZPosition.joystick.rawValue
         return sprite
+    }()
+    lazy var healthCounter: SKLabelNode = {
+        let label = SKLabelNode(text: "Health: \(playerLife)")
+        label.zPosition = NodesZPosition.joystick.rawValue
+        label.zRotation = -1.55
+        label.position = CGPoint(x: displaySize.width/2.7, y: displaySize.height/2.8)
+        return label
+    }()
+    lazy var pauseButton: SKSpriteNode = {
+        let sprite = SKSpriteNode(imageNamed: "Pause")
+        sprite.position = CGPoint(x: displaySize.width/3.5, y: displaySize.height/2.35)
+        sprite.setScale(0.5)
+        sprite.zRotation = -1.55
+        sprite.zPosition = NodesZPosition.joystick.rawValue
+        return sprite
+    }()
+    lazy var pausedLabel: SKLabelNode = {
+        let label = SKLabelNode(text: "p a u s e d .")
+        label.zRotation = -1.55
+        label.zPosition = NodesZPosition.pauseMenuButton.rawValue
+        label.position = CGPoint(x: 100, y: 0)
+        return label
+    }()
+    lazy var menuContinueButton: SKLabelNode = {
+        let label = SKLabelNode(text: "▶︎ c o n t i n u e")
+        label.zPosition = NodesZPosition.pauseMenuButton.rawValue
+        label.zRotation = -1.55
+        label.position = CGPoint(x: 0, y: 13)
+        return label
+    }()
+    lazy var menuRestartButton: SKLabelNode = {
+        let label = SKLabelNode(text: "↺  r e s t a r t")
+        label.zPosition = NodesZPosition.pauseMenuButton.rawValue
+        label.position = CGPoint(x: -75, y: 30)
+        label.zRotation = -1.55
+        return label
+    }()
+    lazy var pauseMenuBackground: SKSpriteNode = {
+        let background = SKSpriteNode(imageNamed: "ZombiePauseBackground")
+        background.setScale(0.75)
+        background.zRotation = -1.55
+        background.position = CGPoint.zero
+        background.zPosition = NodesZPosition.pauseMenuBackground.rawValue
+        return background
     }()
     lazy var player: SKSpriteNode = {
        let sprite = SKSpriteNode(imageNamed: "survivor-idle_handgun_0")
@@ -105,6 +150,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         sprite.alpha = 1
         return sprite
     }()
+    lazy var laserSight: SKShapeNode = {
+        let laser = SKShapeNode()
+        laser.position = player.position
+        laser.lineWidth = 0.1
+        laser.glowWidth = 0.1
+        laser.strokeColor = .red
+        laser.zPosition = NodesZPosition.landmine.rawValue
+        return laser
+    }()
+
     lazy var meleeButton: SKSpriteNode = {
         let sprite = SKSpriteNode(imageNamed: "Knife")
         // Adding circle
@@ -143,6 +198,22 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         sprite.zPosition = NodesZPosition.joystick.rawValue
         sprite.position = CGPoint(x: -75.0, y: 0.0)
         return sprite
+    }()
+    lazy var zombieIcon: SKSpriteNode = {
+        let sprite = SKSpriteNode(imageNamed: "ZombieImage")
+        sprite.zPosition = NodesZPosition.joystick.rawValue
+        sprite.zRotation = -1.55
+        sprite.position = CGPoint(x: displaySize.width/2.5, y: -displaySize.height/3.15)
+        sprite.setScale(0.1)
+        sprite.alpha = 0.6
+        return sprite
+    }()
+    lazy var zombieScoreCounter: SKLabelNode = {
+        let label = SKLabelNode(text: "x \(playerScore)")
+        label.zPosition = NodesZPosition.joystick.rawValue
+        label.zRotation = -1.55
+        label.position = CGPoint(x: displaySize.width/3, y: -displaySize.height/2.5)
+        return label
     }()
     //MARK: Declare Object Settings
     var moveSpeed: TimeInterval = 0.3
@@ -187,6 +258,28 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         zombieCounter += 1
         run(SKAction.playSoundFileNamed("ZombieSpawn", waitForCompletion: false))
         addChild(zombie)
+    }
+    func isTargetVisibleAtAngle(startPoint: CGPoint, angle: CGFloat, distance: CGFloat) -> Bool {
+        let rayStart = startPoint
+        let rayEnd = CGPoint(x: rayStart.x + distance * cos(angle),
+                             y: rayStart.y + distance * sin(angle))
+        
+        let path = CGMutablePath()
+        path.move(to: rayStart)
+        path.addLine(to: rayEnd)
+        laserSight.path = path
+        
+//        var foundOne = false
+//        let _ = physicsWorld.enumerateBodies(alongRayStart: rayStart, end: rayEnd) { (body, point, vector, stop) in
+//            if !foundOne {
+//                foundOne = true
+//                let p = CGMutablePath()
+//                p.move(to: rayStart)
+//                p.addLine(to: point)
+//                self.laserSight.path = p
+//            }
+//        }
+        return false
     }
     
     //MARK: Delays
@@ -243,7 +336,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addChild(restartButton)
     }
     override func didMove(to view: SKView) {
-
         setupNode()
         setupJoyStick()
         characterIdle()
@@ -265,22 +357,42 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addChild(shootButton)
         addChild(meleeButton)
         addChild(healthBar)
+        addChild(healthCounter)
         addChild(landmineButton)
+        addChild(zombieIcon)
+        addChild(zombieScoreCounter)
+        addChild(pauseButton)
+        addChild(laserSight)
+    }
+    private func pauseMenuPopUp() {
+        if gamePause {
+            addChild(pauseMenuBackground)
+            addChild(menuContinueButton)
+            addChild(menuRestartButton)
+            addChild(pausedLabel)
+        } else {
+            removeChildren(in: [pauseMenuBackground, menuContinueButton, menuRestartButton, pausedLabel] )
+        }
     }
     private func setupJoyStick() {
         addChild(analogJoystick)
         analogJoystick.trackingHandler = { [unowned self] data in
             self.player.position = CGPoint(x: self.player.position.x + (data.velocity.x * self.velocityMultiplier), y: self.player.position.y + (data.velocity.y * self.velocityMultiplier))
             self.player.zRotation = data.angular + 1.5
+            // laser sights
+            
+            let _ = self.isTargetVisibleAtAngle(startPoint: self.player.position, angle: self.player.zRotation, distance: self.frame.size.height)
         }
-        
     }
     
     override func update(_ currentTime: TimeInterval) {
+        let maxZombie = 1 + playerScore/10
         if enemies.count < maxZombie {
             spawnZombie()
         }
         healthBar.size.height = CGFloat(playerLife)
+        healthCounter.text = "Health: \(playerLife)"
+        zombieScoreCounter.text = "x \(playerScore)"
         zombieAttack()
         if self.player.position.x > self.gameSpace.maxX - self.player.size.width * 4.25{
             self.player.position.x = self.gameSpace.maxX - self.player.size.width * 4.25
@@ -458,6 +570,30 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                         dropLandmine()
                     }
                 }
+                if pauseButton.contains(t.location(in: self)) {
+                    if gamePause == false {
+                        gamePause = true
+                        self.view?.scene?.isPaused = true
+                        pauseMenuPopUp()
+                    } else {
+                        gamePause = false
+                        self.view?.scene?.isPaused = false
+                        pauseMenuPopUp()
+                    }
+                }
+                if menuRestartButton.contains(t.location(in: self)) {
+                    gamePause = false
+                    self.view?.scene?.isPaused = false
+                    let newScene = GameScene.init(size: CGSize(width: displaySize.width, height: displaySize.height))
+                    newScene.scaleMode = .aspectFill
+                    self.view?.presentScene(newScene)
+                    pauseMenuPopUp()
+                }
+                if menuContinueButton.contains(t.location(in: self)) {
+                    gamePause = false
+                    self.view?.scene?.isPaused = false
+                    pauseMenuPopUp()
+                }
             } else {
                 if restartButton.contains(t.location(in: self)){
                     let newScene = GameScene.init(size: CGSize(width: displaySize.width, height: displaySize.height))
@@ -499,6 +635,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 print("Zombie hit")
                 run(SKAction.playSoundFileNamed("ZombieDeath", waitForCompletion: false))
                 enemies.remove(at: index)
+                playerScore += 1
             }
         } else if (contact.bodyB.categoryBitMask == BodyType.enemy.rawValue && contact.bodyA.categoryBitMask == BodyType.bullet.rawValue) {
             if let index = enemies.index(where: {$0.name == contact.bodyB.node?.name}) {
@@ -507,6 +644,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 print("Zombie hit")
                 run(SKAction.playSoundFileNamed("ZombieDeath", waitForCompletion: false))
                 enemies.remove(at: index)
+                playerScore += 1
             }
         }
         if (contact.bodyA.categoryBitMask == BodyType.enemy.rawValue && contact.bodyB.categoryBitMask == BodyType.playerHit.rawValue) {
@@ -515,8 +653,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 contact.bodyB.node?.removeFromParent()
                 print("Zombie hit")
                 run(SKAction.playSoundFileNamed("ZombieDeath", waitForCompletion: false))
-
                 enemies.remove(at: index)
+                playerScore += 1
             }
         } else if (contact.bodyB.categoryBitMask == BodyType.enemy.rawValue && contact.bodyA.categoryBitMask == BodyType.playerHit.rawValue) {
             if let index = enemies.index(where: {$0.name == contact.bodyB.node?.name}) {
@@ -525,6 +663,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 print("Zombie hit")
                 run(SKAction.playSoundFileNamed("ZombieDeath", waitForCompletion: false))
                 enemies.remove(at: index)
+                playerScore += 1
             }
         }
 
@@ -603,12 +742,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 contact.bodyA.node?.removeFromParent()
                 print("\(contact.bodyA.node!.name!) exploded")
                 enemies.remove(at: index)
+                playerScore += 1
             }
         } else if (contact.bodyB.categoryBitMask == BodyType.enemy.rawValue && contact.bodyA.categoryBitMask == BodyType.explosion.rawValue) {
             if let index = enemies.index(where: {$0.name == contact.bodyB.node?.name}) {
                 contact.bodyB.node?.removeFromParent()
                 print("\(contact.bodyB.node!.name!) exploded")
                 enemies.remove(at: index)
+                playerScore += 1
             }
         }
     }
