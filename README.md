@@ -4,32 +4,35 @@
 ZombieShooter is a top-down shooter that spawns random zombies that targets the player. The player has to survive by dodging the zombie attacks and fight back by shooting, melee or use a landmine. The goal is to survive as long as possible.
 ## Gifs
 
-Movements
+Zombie Movement/Spawn and Player Shooting Action Demo
 
-![zombieshootermovements](https://user-images.githubusercontent.com/7001720/53983314-ee862280-40e4-11e9-99b2-768fe69870ad.gif)
+![ZombieSpawnShooting](https://user-images.githubusercontent.com/7001720/54134550-930eaa00-43ee-11e9-92fc-f5f852d51c21.gif)
 
-Player Attacks
+Melee Action Demo
 
-![zombieshooteractions](https://user-images.githubusercontent.com/7001720/53983778-fdb9a000-40e5-11e9-94d2-64a554a1a75e.gif)
+![MeleeDemo](https://user-images.githubusercontent.com/7001720/54134431-593da380-43ee-11e9-9e92-702b43f5a35f.gif)
 
-Zombie Attacks
+Landmine Demo
 
-![zombieshooterzombieattack](https://user-images.githubusercontent.com/7001720/53983714-dc58b400-40e5-11e9-8c0e-902c25b1320e.gif)
+![LandmineDemo](https://user-images.githubusercontent.com/7001720/54134371-3dd29880-43ee-11e9-900c-43b07bd7658f.gif)
 
-Landmine
+Game Over
 
-![zombieshooterlandmine](https://user-images.githubusercontent.com/7001720/53983823-12963380-40e6-11e9-9d4e-0ec640d092d1.gif)
+![GameOverDemo](https://user-images.githubusercontent.com/7001720/54134255-08c64600-43ee-11e9-898c-db697bf45fc5.gif)
 
 ## Features
  Control the player with an analog joystick.
  
- Button to shoot(far-range attack), melee(close-range attack) and use landmine
+ Button to shoot(far-range attack), melee(close-range attack) and use landmine.
+ 
+ Restart button for new game when health bar is depleted.
+ 
+ Sound added.
  
 ## Requirements
 Hard coded for iPhone 7 Plus.
 
 ## Future Implementations
- Better zombie spawn locations (Currently spawns only from 1 corner randomly)
  
  Add score
  
