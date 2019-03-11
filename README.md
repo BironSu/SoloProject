@@ -4,6 +4,14 @@
 ZombieShooter is a top-down shooter that spawns random zombies that targets the player. The player has to survive by dodging the zombie attacks and fight back by shooting, melee or use a landmine. The goal is to survive as long as possible.
 ## Gifs
 
+Zombie Movement/Spawn and Player Shooting Action Demo
+
+
+
+Melee Action Demo
+
+![MeleeDemo](https://user-images.githubusercontent.com/7001720/54134431-593da380-43ee-11e9-9e92-702b43f5a35f.gif)
+
 Landmine Demo
 
 ![LandmineDemo](https://user-images.githubusercontent.com/7001720/54134371-3dd29880-43ee-11e9-900c-43b07bd7658f.gif)
