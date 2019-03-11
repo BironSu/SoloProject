@@ -17,9 +17,10 @@ enum BodyType: UInt32 {
     case zombieHit = 16
     case landmine = 32
     case explosion = 64
+    case items = 128
 }
 enum NodesZPosition: CGFloat {
-    case background,landmine, bullet, playerMelee, hero, enemy, enemyMelee, joystick , pauseMenuBackground, pauseMenuButton
+    case background, landmine, bullet, playerMelee, hero, enemy, enemyMelee, joystick , pauseMenuBackground, pauseMenuButton
 }
 class GameScene: SKScene, SKPhysicsContactDelegate {
     var velocityMultiplier: CGFloat = 0.06
@@ -30,6 +31,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var zombieCounter = 0
     var turrets: SKSpriteNode?
     var landmines = 1
+    var shotgunAmmo = 8
     var zombieCanAttackPlayer = true
     var zombieMissileCanHitPlayer = true
     var playerCanAttack = true
@@ -37,8 +39,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var explosion = true
     var gameOverStatus = false
     var gamePause = false
+    var shotgunEnabled = false
     var playerScore = 0
     var playerLife = 200
+
     override init(size: CGSize) {
         let maxRatio: CGFloat = 16.0/9.0
         let gameWidth = size.height/maxRatio
@@ -65,6 +69,22 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         label.zPosition = NodesZPosition.joystick.rawValue
         label.zRotation = -1.55
         label.position = CGPoint(x: displaySize.width/2.7, y: displaySize.height/2.8)
+        return label
+    }()
+    lazy var shotgunAmmoImage: SKSpriteNode = {
+        let sprite = SKSpriteNode(imageNamed: "shotgunAmmo")
+        sprite.setScale(0.04)
+        sprite.alpha = 0.6
+        sprite.zPosition = NodesZPosition.joystick.rawValue
+        sprite.zRotation = -1.55
+        sprite.position = CGPoint(x: -displaySize.width/50, y: -displaySize.height/2.6)
+        return sprite
+    }()
+    lazy var shotgunAmmoCounter: SKLabelNode = {
+        let label = SKLabelNode(text: "x \(shotgunAmmo)")
+        label.zPosition = NodesZPosition.joystick.rawValue
+        label.zRotation = -1.55
+        label.position = CGPoint(x: -displaySize.width/25, y: -displaySize.height/2.3)
         return label
     }()
     lazy var pauseButton: SKSpriteNode = {
@@ -113,11 +133,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         sprite.physicsBody?.usesPreciseCollisionDetection = true
         sprite.physicsBody?.affectedByGravity = false
         sprite.physicsBody?.categoryBitMask = BodyType.player.rawValue
-        sprite.physicsBody?.contactTestBitMask = BodyType.enemy.rawValue
-        sprite.physicsBody?.collisionBitMask = BodyType.enemy.rawValue | BodyType.zombieHit.rawValue
+        sprite.physicsBody?.contactTestBitMask = BodyType.enemy.rawValue | BodyType.items.rawValue
+        sprite.physicsBody?.collisionBitMask = BodyType.enemy.rawValue | BodyType.zombieHit.rawValue | BodyType.items.rawValue
         sprite.physicsBody?.isDynamic = true
         sprite.zRotation = 1.5
         sprite.setScale(0.2)
+        sprite.name = "Player"
         return sprite
     }()
     
@@ -134,6 +155,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         js.zPosition = NodesZPosition.joystick.rawValue
         js.alpha = 0.5
         return js
+    }()
+    lazy var swapButton: SKLabelNode = {
+        let label = SKLabelNode(text: "↻")
+        label.position = CGPoint(x: -displaySize.width/10, y: -displaySize.height/2.5)
+        label.zPosition = NodesZPosition.joystick.rawValue
+        return label
     }()
     lazy var shootButton: SKSpriteNode = {
        let sprite = SKSpriteNode(imageNamed: "pistolButton")
@@ -187,7 +214,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     lazy var gameOverLogo: SKSpriteNode = {
         let sprite = SKSpriteNode(imageNamed: "You'veDied")
         sprite.zRotation = -1.55
-        sprite.zPosition = NodesZPosition.joystick.rawValue
+        sprite.zPosition = NodesZPosition.pauseMenuButton.rawValue
         sprite.position = CGPoint(x: 25.0, y: 0.0)
         return sprite
     }()
@@ -195,7 +222,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let sprite = SKSpriteNode(imageNamed: "Restart")
         sprite.setScale(0.3)
         sprite.zRotation = -1.55
-        sprite.zPosition = NodesZPosition.joystick.rawValue
+        sprite.zPosition = NodesZPosition.pauseMenuButton.rawValue
         sprite.position = CGPoint(x: -75.0, y: 0.0)
         return sprite
     }()
@@ -233,7 +260,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let playerIdle = SKAction(named: "PlayerIdle")!
         player.run(SKAction.repeatForever(playerIdle))
     }
-    private func characterWalk() {
+    private func shotgunIdle() {
         player.removeAllActions()
         let playerWalk = SKAction(named: "PlayerWalking")!
         player.run(SKAction.repeatForever(playerWalk))
@@ -269,16 +296,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         path.addLine(to: rayEnd)
         laserSight.path = path
         
-//        var foundOne = false
-//        let _ = physicsWorld.enumerateBodies(alongRayStart: rayStart, end: rayEnd) { (body, point, vector, stop) in
-//            if !foundOne {
-//                foundOne = true
-//                let p = CGMutablePath()
-//                p.move(to: rayStart)
-//                p.addLine(to: point)
-//                self.laserSight.path = p
-//            }
-//        }
+        var foundOne = false
+        let _ = physicsWorld.enumerateBodies(alongRayStart: rayStart, end: rayEnd) { (body, point, vector, stop) in
+            if body.node?.name != "Player" {
+                if !foundOne {
+                    foundOne = true
+                    let p = CGMutablePath()
+                    p.move(to: rayStart)
+                    p.addLine(to: point)
+                    self.laserSight.path = p
+                }
+            }
+        }
         return false
     }
     
@@ -330,15 +359,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             node.position.y += velocityY
         }
     }
+    // testimg
+    
     private func gameOver() {
         gameOverStatus = true
+        addChild(pauseMenuBackground)
         addChild(gameOverLogo)
         addChild(restartButton)
     }
     override func didMove(to view: SKView) {
         setupNode()
         setupJoyStick()
-        characterIdle()
+//        characterIdle()
         //setupSwipeMovement()
         self.physicsWorld.contactDelegate = self
         self.physicsWorld.gravity = CGVector.init(dx: 1, dy: 0)
@@ -363,6 +395,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addChild(zombieScoreCounter)
         addChild(pauseButton)
         addChild(laserSight)
+        addChild(swapButton)
+        addChild(shotgunAmmoCounter)
+        addChild(shotgunAmmoImage)
     }
     private func pauseMenuPopUp() {
         if gamePause {
@@ -384,7 +419,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             let _ = self.isTargetVisibleAtAngle(startPoint: self.player.position, angle: self.player.zRotation, distance: self.frame.size.height)
         }
     }
-    
     override func update(_ currentTime: TimeInterval) {
         let maxZombie = 1 + playerScore/10
         if enemies.count < maxZombie {
@@ -393,6 +427,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         healthBar.size.height = CGFloat(playerLife)
         healthCounter.text = "Health: \(playerLife)"
         zombieScoreCounter.text = "x \(playerScore)"
+        shotgunAmmoCounter.text = "x \(shotgunAmmo)"
         zombieAttack()
         if self.player.position.x > self.gameSpace.maxX - self.player.size.width * 4.25{
             self.player.position.x = self.gameSpace.maxX - self.player.size.width * 4.25
@@ -433,10 +468,35 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         run(SKAction.playSoundFileNamed("Knife.wav", waitForCompletion: false))
         addChild(melee)
     }
-    func shootAttack() {
+    func shotgunMelee() {
+        let meleeAttackAnimation: SKAction = SKAction(named: "ShotgunMelee", duration: 0.5)!
+        let melee = SKSpriteNode(imageNamed: "PlayerHit")
+        
+        player.run(meleeAttackAnimation)
+        melee.setScale(0.1)
+        melee.size.height = melee.size.height + 90
+        melee.position = player.position
+        melee.zPosition = NodesZPosition.playerMelee.rawValue
+        melee.zRotation = player.zRotation
+        let action = SKAction.move(to: CGPoint(x: 40 * cos(melee.zRotation) + melee.position.x, y: 40 * sin(melee.zRotation) + melee.position.y), duration: 0.1)
+        let actionDone = SKAction.removeFromParent()
+        melee.run(SKAction.sequence([action,actionDone]))
+        melee.zRotation = player.zRotation + 3
+        let presetTexture = SKTexture(imageNamed: "PlayerHit")
+        melee.physicsBody = SKPhysicsBody(texture: presetTexture, size: melee.size)
+        melee.physicsBody?.affectedByGravity = false
+        melee.physicsBody?.isDynamic = true
+        melee.physicsBody?.usesPreciseCollisionDetection = false
+        melee.physicsBody?.categoryBitMask = BodyType.playerHit.rawValue
+        melee.physicsBody?.contactTestBitMask = BodyType.enemy.rawValue | BodyType.zombieHit.rawValue
+        melee.physicsBody?.collisionBitMask = BodyType.enemy.rawValue | BodyType.zombieHit.rawValue
+        run(SKAction.playSoundFileNamed("Knife.wav", waitForCompletion: false))
+        addChild(melee)
+    }
+    func pistolAttack() {
         let shootAttackAnimation: SKAction = SKAction(named: "ShootAttack", duration: 0.5)!
+        
         let bullet = SKSpriteNode(imageNamed: "Bullet")
-
         bullet.setScale(0.05)
         bullet.position = player.position
         bullet.zPosition = NodesZPosition.bullet.rawValue
@@ -450,12 +510,39 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         bullet.physicsBody?.isDynamic = false
         bullet.physicsBody?.usesPreciseCollisionDetection = true
         bullet.physicsBody?.categoryBitMask = BodyType.bullet.rawValue
-        bullet.physicsBody?.contactTestBitMask = BodyType.enemy.rawValue
-        bullet.physicsBody?.collisionBitMask = BodyType.enemy.rawValue
+        bullet.physicsBody?.contactTestBitMask = BodyType.enemy.rawValue | BodyType.items.rawValue
+        bullet.physicsBody?.collisionBitMask = BodyType.enemy.rawValue | BodyType.items.rawValue
         run(SKAction.playSoundFileNamed("GunShot.flac", waitForCompletion: false))
-        player.run(shootAttackAnimation)
         addChild(bullet)
-        characterIdle()
+        player.run(shootAttackAnimation)
+    }
+    func shotgunAttack() {
+        let shootAttackAnimation: SKAction = SKAction(named: "ShotgunAttack", duration: 0.5)!
+        
+        let bullet = SKSpriteNode(imageNamed: "ShotGunFire")
+        bullet.setScale(0.02)
+        bullet.position = player.position
+        bullet.zPosition = NodesZPosition.bullet.rawValue
+        bullet.zRotation = player.zRotation
+        let action = SKAction.move(to: CGPoint(x: 100 * cos(bullet.zRotation) + bullet.position.x, y: 100 * sin(bullet.zRotation) + bullet.position.y), duration: 0.1)
+        let actionDone = SKAction.removeFromParent()
+        bullet.run(SKAction.sequence([action,actionDone]))
+        bullet.zRotation = player.zRotation + 4.75
+        bullet.physicsBody = SKPhysicsBody(rectangleOf: bullet.size)
+        bullet.physicsBody?.affectedByGravity = false
+        bullet.physicsBody?.isDynamic = false
+        bullet.physicsBody?.usesPreciseCollisionDetection = true
+        bullet.physicsBody?.categoryBitMask = BodyType.bullet.rawValue
+        bullet.physicsBody?.contactTestBitMask = BodyType.enemy.rawValue | BodyType.items.rawValue
+        bullet.physicsBody?.collisionBitMask = BodyType.enemy.rawValue | BodyType.items.rawValue
+        run(SKAction.playSoundFileNamed("GunShot.flac", waitForCompletion: false))
+        addChild(bullet)
+        player.run(shootAttackAnimation)
+        let scale = SKAction.scale(by: 7, duration: 0.2)
+        let fadeOut = SKAction.fadeOut(withDuration: 0.5)
+        let delete = SKAction.removeFromParent()
+        let explosionSequence = SKAction.sequence([scale, fadeOut, delete])
+        bullet.run(explosionSequence)
     }
     func dropLandmine() {
         let landmine = SKSpriteNode(imageNamed: "landmine")
@@ -474,25 +561,25 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
 
     func landmineExplode(landmineNode: SKNode) {
-        let explosion = SKSpriteNode(imageNamed: "LandmineExplode")
-        explosion.position = landmineNode.position
-        explosion.zPosition = NodesZPosition.joystick.rawValue
-        explosion.setScale(0.1)
-        explosion.zRotation = -1.5
+        let landMineExplosion = SKSpriteNode(imageNamed: "LandmineExplode")
+        landMineExplosion.position = landmineNode.position
+        landMineExplosion.zPosition = NodesZPosition.joystick.rawValue
+        landMineExplosion.setScale(0.1)
+        landMineExplosion.zRotation = -1.5
         let presetTexture = SKTexture(imageNamed: "LandmineExplode")
-        explosion.physicsBody = SKPhysicsBody(texture: presetTexture, size: explosion.size)
-        explosion.physicsBody?.categoryBitMask = BodyType.explosion.rawValue
-        explosion.physicsBody?.contactTestBitMask = BodyType.enemy.rawValue
-        explosion.physicsBody?.collisionBitMask = BodyType.enemy.rawValue
-        explosion.physicsBody?.affectedByGravity = false
-        explosion.physicsBody?.isDynamic = false
+        landMineExplosion.physicsBody = SKPhysicsBody(texture: presetTexture, size: landMineExplosion.size)
+        landMineExplosion.physicsBody?.categoryBitMask = BodyType.explosion.rawValue
+        landMineExplosion.physicsBody?.contactTestBitMask = BodyType.enemy.rawValue
+        landMineExplosion.physicsBody?.collisionBitMask = BodyType.enemy.rawValue
+        landMineExplosion.physicsBody?.affectedByGravity = false
+        landMineExplosion.physicsBody?.isDynamic = false
         run(SKAction.playSoundFileNamed("Explosion.flac", waitForCompletion: false))
-        addChild(explosion)
+        addChild(landMineExplosion)
         let scale = SKAction.scale(by: 7, duration: 0.2)
         let fadeOut = SKAction.fadeOut(withDuration: 0.5)
         let delete = SKAction.removeFromParent()
         let explosionSequence = SKAction.sequence([scale, fadeOut, delete])
-        explosion.run(explosionSequence)
+        landMineExplosion.run(explosionSequence)
         
     }
     func zombieAttackProjectile(zombieNode: SKNode) {
@@ -525,6 +612,25 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 
         addChild(melee)
     }
+    func dropItem(node: SKNode) {
+        let rngDropRate = Int.random(in: 0 ... 2)
+        let rngDropRateTwo = Int.random(in: 0 ... 1)
+        if rngDropRate == rngDropRateTwo {
+            let shotgunAmmunition = SKSpriteNode(imageNamed: "shotgunAmmo")
+            shotgunAmmunition.setScale(0.035)
+            shotgunAmmunition.zRotation = -1.55
+            shotgunAmmunition.zPosition = NodesZPosition.landmine.rawValue
+            shotgunAmmunition.physicsBody = SKPhysicsBody(circleOfRadius: 10)
+            shotgunAmmunition.physicsBody?.affectedByGravity = false
+            shotgunAmmunition.physicsBody?.categoryBitMask = BodyType.items.rawValue
+            shotgunAmmunition.physicsBody?.contactTestBitMask = BodyType.player.rawValue
+            shotgunAmmunition.physicsBody?.collisionBitMask = BodyType.player.rawValue | BodyType.bullet.rawValue
+            shotgunAmmunition.physicsBody?.isDynamic = true
+            shotgunAmmunition.name = "ShotgunAmmo"
+            shotgunAmmunition.position = node.position
+            addChild(shotgunAmmunition)
+        }
+    }
     
     func touchDown(atPoint pos : CGPoint) {
     }
@@ -549,10 +655,25 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             if !gameOverStatus {
                 if shootButton.contains(t.location(in: self)) {
                     if playerCanShoot {
-                        shootAttack()
-                        shootButton.alpha = 0.3
-                        playerCanShoot = false
-                        playerShootTimer()
+                        if !shotgunEnabled {
+                            pistolAttack()
+                            shootButton.alpha = 0.3
+                            playerCanShoot = false
+                            playerShootTimer()
+                        } else {
+                            if shotgunAmmo > 0 {
+                                shotgunAttack()
+                                shotgunAmmo -= 1
+                                shootButton.alpha = 0.3
+                                playerCanShoot = false
+                                playerShootTimer()
+                            } else {
+                                shotgunMelee()
+                                shootButton.alpha = 0.3
+                                playerCanShoot = false
+                                playerShootTimer()
+                            }
+                        }
                     }
                 }
                 if meleeButton.contains(t.location(in: self)) {
@@ -561,6 +682,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                         meleeButton.alpha = 0.3
                         playerCanAttack = false
                         playerAttackTimer()
+                    }
+                }
+                if swapButton.contains(t.location(in: self)) {
+                    if playerCanAttack {
+                        if !shotgunEnabled {
+                        player.texture = SKTexture(imageNamed: "survivor-idle_shotgun_0")
+                            shotgunEnabled = true
+                        } else {
+                            player.texture = SKTexture(imageNamed: "survivor-idle_handgun_0")
+                            shotgunEnabled = false
+                        }
                     }
                 }
                 if landmineButton.contains(t.location(in: self)) {
@@ -636,6 +768,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 run(SKAction.playSoundFileNamed("ZombieDeath", waitForCompletion: false))
                 enemies.remove(at: index)
                 playerScore += 1
+                dropItem(node: contact.bodyA.node!)
+
             }
         } else if (contact.bodyB.categoryBitMask == BodyType.enemy.rawValue && contact.bodyA.categoryBitMask == BodyType.bullet.rawValue) {
             if let index = enemies.index(where: {$0.name == contact.bodyB.node?.name}) {
@@ -645,6 +779,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 run(SKAction.playSoundFileNamed("ZombieDeath", waitForCompletion: false))
                 enemies.remove(at: index)
                 playerScore += 1
+                dropItem(node: contact.bodyB.node!)
+
             }
         }
         if (contact.bodyA.categoryBitMask == BodyType.enemy.rawValue && contact.bodyB.categoryBitMask == BodyType.playerHit.rawValue) {
@@ -655,6 +791,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 run(SKAction.playSoundFileNamed("ZombieDeath", waitForCompletion: false))
                 enemies.remove(at: index)
                 playerScore += 1
+                dropItem(node: contact.bodyA.node!)
             }
         } else if (contact.bodyB.categoryBitMask == BodyType.enemy.rawValue && contact.bodyA.categoryBitMask == BodyType.playerHit.rawValue) {
             if let index = enemies.index(where: {$0.name == contact.bodyB.node?.name}) {
@@ -664,6 +801,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 run(SKAction.playSoundFileNamed("ZombieDeath", waitForCompletion: false))
                 enemies.remove(at: index)
                 playerScore += 1
+                dropItem(node: contact.bodyB.node!)
             }
         }
 
@@ -751,6 +889,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 enemies.remove(at: index)
                 playerScore += 1
             }
+        }
+        if (contact.bodyA.categoryBitMask == BodyType.items.rawValue && contact.bodyB.categoryBitMask == BodyType.player.rawValue) {
+            contact.bodyA.node?.removeFromParent()
+            shotgunAmmo += 1
+        } else if (contact.bodyB.categoryBitMask == BodyType.items.rawValue && contact.bodyA.categoryBitMask == BodyType.player.rawValue) {
+            contact.bodyB.node?.removeFromParent()
+            shotgunAmmo += 1
+        }
+        if (contact.bodyA.categoryBitMask == BodyType.items.rawValue && contact.bodyB.categoryBitMask == BodyType.bullet.rawValue) {
+            contact.bodyA.node?.removeFromParent()
+            landmineExplode(landmineNode: contact.bodyA.node!)
+        } else if (contact.bodyB.categoryBitMask == BodyType.items.rawValue && contact.bodyA.categoryBitMask == BodyType.bullet.rawValue) {
+            contact.bodyB.node?.removeFromParent()
+            landmineExplode(landmineNode: contact.bodyB.node!)
         }
     }
 }
