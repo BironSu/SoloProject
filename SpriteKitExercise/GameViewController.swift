@@ -21,7 +21,7 @@ class GameViewController: UIViewController {
         super.viewDidLoad()
         setupViews()
     }
-    fileprivate func setupViews() {
+    func setupViews() {
         view.addSubview(skView)
         let displaySize: CGRect = UIScreen.main.bounds
         let displayWidth = displaySize.width

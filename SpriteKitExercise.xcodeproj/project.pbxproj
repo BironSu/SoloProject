@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		9350F5E8222997900066AF96 /* AnalogJoystick.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9350F5E7222997900066AF96 /* AnalogJoystick.swift */; };
 		937E73132208AAB400ABC0F9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937E73122208AAB400ABC0F9 /* AppDelegate.swift */; };
-		937E73152208AAB400ABC0F9 /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 937E73142208AAB400ABC0F9 /* GameScene.sks */; };
 		937E73172208AAB400ABC0F9 /* Actions.sks in Resources */ = {isa = PBXBuildFile; fileRef = 937E73162208AAB400ABC0F9 /* Actions.sks */; };
 		937E73192208AAB400ABC0F9 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937E73182208AAB400ABC0F9 /* GameScene.swift */; };
 		937E731B2208AAB400ABC0F9 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937E731A2208AAB400ABC0F9 /* GameViewController.swift */; };
@@ -31,7 +30,6 @@
 		9350F5E7222997900066AF96 /* AnalogJoystick.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalogJoystick.swift; sourceTree = "<group>"; };
 		937E730F2208AAB400ABC0F9 /* SpriteKitExercise.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SpriteKitExercise.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		937E73122208AAB400ABC0F9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		937E73142208AAB400ABC0F9 /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
 		937E73162208AAB400ABC0F9 /* Actions.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Actions.sks; sourceTree = "<group>"; };
 		937E73182208AAB400ABC0F9 /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
 		937E731A2208AAB400ABC0F9 /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
@@ -96,7 +94,6 @@
 			isa = PBXGroup;
 			children = (
 				937E73122208AAB400ABC0F9 /* AppDelegate.swift */,
-				937E73142208AAB400ABC0F9 /* GameScene.sks */,
 				937E73162208AAB400ABC0F9 /* Actions.sks */,
 				937E73182208AAB400ABC0F9 /* GameScene.swift */,
 				93D26DFD2231AC5600181DE3 /* shader1.fsh */,
@@ -174,7 +171,6 @@
 				93D26E112233024B00181DE3 /* Knife.wav in Resources */,
 				93D26E042232F99900181DE3 /* ZombieSpawn.wav in Resources */,
 				93D26E052232F99900181DE3 /* ZombieDeath.wav in Resources */,
-				937E73152208AAB400ABC0F9 /* GameScene.sks in Resources */,
 				93D26E062232F99900181DE3 /* Explosion.flac in Resources */,
 				93D26E072232F99900181DE3 /* GunShot.flac in Resources */,
 				93D26E13223303D100181DE3 /* PlayerHit.wav in Resources */,
