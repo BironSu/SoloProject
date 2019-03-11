@@ -6,7 +6,7 @@ ZombieShooter is a top-down shooter that spawns random zombies that targets the 
 
 Zombie Movement/Spawn and Player Shooting Action Demo
 
-
+![ZombieSpawnShooting](https://user-images.githubusercontent.com/7001720/54134550-930eaa00-43ee-11e9-92fc-f5f852d51c21.gif)
 
 Melee Action Demo
 
