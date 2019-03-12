@@ -20,7 +20,7 @@ Shotgun Ammo Drop and Ammo Explosion
 
 ![ShootingAmmoDropExplosion](https://user-images.githubusercontent.com/7001720/54206742-4ccd4f80-44af-11e9-9ef7-ba1cdeeecb69.gif)
 
-Shotgun Swap/ Shotgun Shot
+Shotgun Swap/ Shotgun Shot / Laser
 
 ![ShotgunSwapShot](https://user-images.githubusercontent.com/7001720/54206788-6373a680-44af-11e9-959a-201630cbc972.gif)
 
