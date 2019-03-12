@@ -33,11 +33,24 @@ Zombie spawn increase every 10 kills
 ![ZombieSpawn](https://user-images.githubusercontent.com/7001720/54206869-89994680-44af-11e9-9bfc-19bd4751690a.gif)
 
 ## Features
+ 
+ Swap to shotgun which consumes shotgun ammo that can be dropped by zombies by chance.
+ 
+ Shotgun Ammo explodes when shot at.
+ 
+ Shotgun Melee animation when out of ammunition.
+ 
  Control the player with an analog joystick.
  
  Button to shoot(far-range attack), melee(close-range attack) and use landmine.
  
  Restart button for new game when health bar is depleted.
+ 
+ Pause menu with continue/restart option.
+ 
+ Zombie counter.
+ 
+ Zombie spawn increases after certain points.
  
  Sound added.
  
@@ -45,8 +58,6 @@ Zombie spawn increase every 10 kills
 Hard coded for iPhone 7 Plus.
 
 ## Future Implementations
- 
- Add score
  
  Add turret (Auto targets closest zombie)
  
