@@ -17,10 +17,11 @@ class Turret: SKSpriteNode {
     func updateClosestZombie() {
         let gameScene = (self.scene! as! GameScene)
         let zombieArray = gameScene.enemies
-        
+        var closestZombie = SKSpriteNode()
         var prevDistance:CGFloat = 1000000
-        var closestZombie = zombieArray[0]
-        
+        if !zombieArray.isEmpty {
+            closestZombie = zombieArray[0]
+        }
         for zombie in zombieArray {
             
             let distance = hypot(zombie.position.x - self.position.x, zombie.position.y - self.position.y)

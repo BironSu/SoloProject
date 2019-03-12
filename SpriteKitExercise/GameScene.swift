@@ -29,7 +29,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var timer = Timer()
     var enemies = [SKSpriteNode]()
     var zombieCounter = 0
-    var turrets: SKSpriteNode?
+    var turrets: Turret?
     var landmines = 1
     var shotgunAmmo = 8
     var zombieCanAttackPlayer = true
@@ -254,17 +254,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let radius = (size.width >= size.height ? (size.width + spriteSize.width) : (size.height + spriteSize.height)) / 2
         return CGPoint(x: cos(angle) * radius, y: sin(angle) * radius)
     }
-    
-    private func characterIdle() {
-        player.removeAllActions()
-        let playerIdle = SKAction(named: "PlayerIdle")!
-        player.run(SKAction.repeatForever(playerIdle))
-    }
-    private func shotgunIdle() {
-        player.removeAllActions()
-        let playerWalk = SKAction(named: "PlayerWalking")!
-        player.run(SKAction.repeatForever(playerWalk))
-    }
     private func spawnZombie() {
         let xPos = randomPosition(spriteSize: gameSpace.size)
         let zombie = SKSpriteNode(imageNamed: "skeleton-idle_0")
@@ -273,7 +262,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         zombie.zPosition = NodesZPosition.enemy.rawValue
         let presetTexture = SKTexture(imageNamed: "skeleton-idle_0.png")
         zombie.physicsBody = SKPhysicsBody(texture: presetTexture, size: presetTexture.size())
-        zombie.physicsBody?.usesPreciseCollisionDetection = true
         zombie.physicsBody?.isDynamic = true
         zombie.physicsBody?.affectedByGravity = false
         zombie.physicsBody?.categoryBitMask = BodyType.enemy.rawValue
@@ -284,6 +272,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         enemies.append(zombie)
         zombieCounter += 1
         run(SKAction.playSoundFileNamed("ZombieSpawn", waitForCompletion: false))
+        keepEnemiesSeparated()
+        
         addChild(zombie)
     }
     func isTargetVisibleAtAngle(startPoint: CGPoint, angle: CGFloat, distance: CGFloat) -> Bool {
@@ -339,7 +329,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         meleeButton.alpha = 1
         playerCanAttack = true
     }
-    @objc func zombieAttack() {
+    func zombieAttack() {
         let location = player.position
         for node in enemies {
             let followPlayer = SKAction.move(to: player.position, duration: 3)
@@ -370,8 +360,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     override func didMove(to view: SKView) {
         setupNode()
         setupJoyStick()
-//        characterIdle()
         //setupSwipeMovement()
+
         self.physicsWorld.contactDelegate = self
         self.physicsWorld.gravity = CGVector.init(dx: 1, dy: 0)
         
@@ -420,10 +410,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     override func update(_ currentTime: TimeInterval) {
-        let maxZombie = 1 + playerScore/10
-        if enemies.count < maxZombie {
-            spawnZombie()
+//        let maxZombie = 1 + playerScore/10
+        if let turrets = turrets {
+            turrets.updateClosestZombie()
+            turrets.turnTowardsClosestZombie()
         }
+//        if enemies.count < maxZombie {
+//            spawnZombie()
+//        }
         healthBar.size.height = CGFloat(playerLife)
         healthCounter.text = "Health: \(playerLife)"
         zombieScoreCounter.text = "x \(playerScore)"
@@ -631,7 +625,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             addChild(shotgunAmmunition)
         }
     }
-    
+    private func keepEnemiesSeparated() {
+        // Assign constrain
+        for enemy in enemies {
+            enemy.constraints = []
+            let distanceBetween = CGFloat(60)
+            let constraint = SKConstraint.distance(SKRange(lowerLimit: distanceBetween), to: enemy)
+            enemy.constraints!.append(constraint)
+
+        }
+    }
     func touchDown(atPoint pos : CGPoint) {
     }
     
@@ -640,15 +643,26 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     func touchUp(atPoint pos : CGPoint) {
     }
-    
+    // ADDING TURRET HOPEFULLY IT WORKS
+    private func towersShootEverySecond(turret: Turret) {
+        
+        let action = SKAction.run {
+//            for bombTower in towerArray {
+        guard turret.closestZombie != nil else { return } // I haven't tested this guard statement yet.
+        turret.addBulletThenShootAtClosestZOmbie()
+//            }
+        }
+        self.run(.repeatForever(.sequence([.wait(forDuration: 1), action])))
+    }
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         for t in touches {
             if (turrets == nil) {
-                let turret = SKSpriteNode(imageNamed: "turret")
+                let turret = Turret(imageNamed: "turret")
                 turret.position.x = t.location(in: self).x
                 turret.position.y = t.location(in: self).y
                 turret.zPosition = NodesZPosition.hero.rawValue
                 turrets = turret
+                towersShootEverySecond(turret: turrets!)
                 addChild(turret)
             }
             self.touchDown(atPoint: t.location(in: self))
