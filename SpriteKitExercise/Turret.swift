@@ -40,17 +40,17 @@ class Turret: SKSpriteNode {
     }
     
     private func makeTurretBullet() -> SKSpriteNode {
-        let turretBullet = SKSpriteNode(imageNamed: "Bullet")
+        let turretBullet = SKSpriteNode(imageNamed: "SilverSphere")
         turretBullet.position = self.position
         turretBullet.zPosition = 20
-        turretBullet.size = CGSize(width: 20, height: 20)
+        turretBullet.size = CGSize(width: 10, height: 10)
         //turretBullet.setScale (frame.size.height / 5000)
         
         turretBullet.physicsBody = SKPhysicsBody(circleOfRadius: max(turretBullet.size.width / 2, turretBullet.size.height / 2))
         turretBullet.physicsBody?.affectedByGravity = false
         turretBullet.physicsBody?.categoryBitMask = BodyType.bullet.rawValue
         turretBullet.physicsBody?.collisionBitMask = BodyType.enemy.rawValue
-        turretBullet.physicsBody?.contactTestBitMask = BodyType.enemy.rawValue
+        turretBullet.physicsBody?.contactTestBitMask = BodyType.enemy.rawValue | BodyType.items.rawValue
         return turretBullet
     }
     

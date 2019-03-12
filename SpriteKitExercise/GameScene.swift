@@ -30,7 +30,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var enemies = [SKSpriteNode]()
     var zombieCounter = 0
     var turrets: Turret?
-    var landmines = 1
+    var landmineEnabled = true
     var shotgunAmmo = 8
     var zombieCanAttackPlayer = true
     var zombieMissileCanHitPlayer = true
@@ -40,15 +40,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var gameOverStatus = false
     var gamePause = false
     var shotgunEnabled = false
+    var turretButtonEnabled = true
+    var canPlaceTurret = false
     var playerScore = 0
     var playerLife = 200
-
+    var landmineCoolDown = 15.0
     override init(size: CGSize) {
         let maxRatio: CGFloat = 16.0/9.0
         let gameWidth = size.height/maxRatio
         let gameSide = (size.width - gameWidth) / 2
-        
-        gameSpace = CGRect(x: gameSide, y: 0, width: gameWidth, height: size.height)
+        gameSpace = CGRect(x: gameSide,
+                           y: 0,
+                           width: gameWidth,
+                           height: size.height)
         super.init(size: size)
     }
     required init?(coder aDecoder: NSCoder) {
@@ -156,11 +160,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         js.alpha = 0.5
         return js
     }()
-    lazy var swapButton: SKLabelNode = {
-        let label = SKLabelNode(text: "↻")
-        label.position = CGPoint(x: -displaySize.width/10, y: -displaySize.height/2.5)
-        label.zPosition = NodesZPosition.joystick.rawValue
-        return label
+    lazy var swapButton: SKSpriteNode = {
+        let sprite = SKSpriteNode(imageNamed: "shotgunIcon")
+        sprite.setScale(0.25)
+        sprite.zRotation = -1.5
+        sprite.position = CGPoint(x: -displaySize.width/8, y: -displaySize.height/2.75)
+        sprite.zPosition = NodesZPosition.joystick.rawValue
+        return sprite
     }()
     lazy var shootButton: SKSpriteNode = {
        let sprite = SKSpriteNode(imageNamed: "pistolButton")
@@ -186,7 +192,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         laser.zPosition = NodesZPosition.landmine.rawValue
         return laser
     }()
-
+    lazy var turretButton: SKSpriteNode = {
+        let sprite = SKSpriteNode(imageNamed: "TurretIcon")
+        sprite.setScale(0.2)
+        sprite.zRotation = -1.55
+        sprite.position = CGPoint(x: -displaySize.width/4 , y: -displaySize.height/3.15)
+        sprite.zPosition = NodesZPosition.joystick.rawValue
+        return sprite
+    }()
     lazy var meleeButton: SKSpriteNode = {
         let sprite = SKSpriteNode(imageNamed: "Knife")
         // Adding circle
@@ -196,7 +209,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             SKUniform(name: "u_health", float: 0.5)
         ]
         sprite.shader = shader
-        
         sprite.setScale(0.1)
         sprite.position = CGPoint(x: -displaySize.width/2.5 , y: -displaySize.height/3)
         sprite.zPosition = NodesZPosition.joystick.rawValue
@@ -244,10 +256,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }()
     //MARK: Declare Object Settings
     var moveSpeed: TimeInterval = 0.3
-    
     //MARK: Declare Object Actions
     let tapRec = UITapGestureRecognizer()
-    
     // spawning outside frame
     func randomPosition(spriteSize:CGSize) -> CGPoint {
         let angle = (CGFloat(arc4random_uniform(360)) * CGFloat.pi) / 180.0
@@ -273,19 +283,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         zombieCounter += 1
         run(SKAction.playSoundFileNamed("ZombieSpawn", waitForCompletion: false))
         keepEnemiesSeparated()
-        
         addChild(zombie)
     }
     func isTargetVisibleAtAngle(startPoint: CGPoint, angle: CGFloat, distance: CGFloat) -> Bool {
         let rayStart = startPoint
         let rayEnd = CGPoint(x: rayStart.x + distance * cos(angle),
                              y: rayStart.y + distance * sin(angle))
-        
         let path = CGMutablePath()
         path.move(to: rayStart)
         path.addLine(to: rayEnd)
         laserSight.path = path
-        
         var foundOne = false
         let _ = physicsWorld.enumerateBodies(alongRayStart: rayStart, end: rayEnd) { (body, point, vector, stop) in
             if body.node?.name != "Player" {
@@ -300,7 +307,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
         return false
     }
-    
     //MARK: Delays
     private func zombieAttackTimer() {
         timer = Timer.scheduledTimer(timeInterval: 2, target: self, selector: #selector(attackPlayerTrue), userInfo: nil, repeats: false)
@@ -308,7 +314,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     @objc func attackPlayerTrue() {
         zombieCanAttackPlayer = true
     }
-    
     private func zombieMissileTimer() {
         timer = Timer.scheduledTimer(timeInterval: 2, target: self, selector: #selector(zombieMissileTrue), userInfo: nil, repeats: false)
     }
@@ -329,6 +334,30 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         meleeButton.alpha = 1
         playerCanAttack = true
     }
+    private func landmineTimer() {
+        timer = Timer.scheduledTimer(timeInterval: landmineCoolDown, target: self, selector: #selector(explosionTrue), userInfo: nil, repeats: false)
+    }
+    @objc func explosionTrue() {
+        landmineButton.alpha = 1
+        landmineEnabled = true
+    }
+    private func turretTimer(target: Turret) {
+        timer = Timer.scheduledTimer(timeInterval: 10, target: self, selector: #selector(turretExplode(tur:)), userInfo: target, repeats: false)
+    }
+    @objc func turretExplode(tur: Timer) {
+        if let target = tur.userInfo as? Turret {
+            landmineExplode(landmineNode: target)
+            target.removeFromParent()
+        }
+        turretCoolDownTimer()
+    }
+    private func turretCoolDownTimer() {
+        timer = Timer.scheduledTimer(timeInterval: 20, target: self, selector: #selector(turretButtonEnabler), userInfo: nil, repeats: false)
+    }
+    @objc func turretButtonEnabler() {
+        turretButton.alpha = 1
+        turretButtonEnabled = true
+    }
     func zombieAttack() {
         let location = player.position
         for node in enemies {
@@ -338,19 +367,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             let dx = (location.x) - node.position.x
             let dy = (location.y) - node.position.y
             let angle = atan2(dy, dx)
-
             node.zRotation = angle
-
             //Seek
             let velocityX =  cos(angle) * 1
             let velocityY =  sin(angle) * 1
-
             node.position.x += velocityX
             node.position.y += velocityY
         }
     }
-    // testimg
-    
     private func gameOver() {
         gameOverStatus = true
         addChild(pauseMenuBackground)
@@ -360,18 +384,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     override func didMove(to view: SKView) {
         setupNode()
         setupJoyStick()
-        //setupSwipeMovement()
-
         self.physicsWorld.contactDelegate = self
         self.physicsWorld.gravity = CGVector.init(dx: 1, dy: 0)
-        
     }
     //MARK: Adding View
     private func setupView() {
-        
     }
     //MARK: Adding Objects
-
     private func setupNode() {
         anchorPoint = CGPoint(x: 0.5, y: 0.5)
         addChild(background)
@@ -388,6 +407,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addChild(swapButton)
         addChild(shotgunAmmoCounter)
         addChild(shotgunAmmoImage)
+        addChild(turretButton)
     }
     private func pauseMenuPopUp() {
         if gamePause {
@@ -405,19 +425,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             self.player.position = CGPoint(x: self.player.position.x + (data.velocity.x * self.velocityMultiplier), y: self.player.position.y + (data.velocity.y * self.velocityMultiplier))
             self.player.zRotation = data.angular + 1.5
             // laser sights
-            
-            let _ = self.isTargetVisibleAtAngle(startPoint: self.player.position, angle: self.player.zRotation, distance: self.frame.size.height)
+            let _ = self.isTargetVisibleAtAngle(startPoint: self.player.position,
+                                                angle: self.player.zRotation,
+                                                distance: self.frame.size.height)
         }
     }
     override func update(_ currentTime: TimeInterval) {
-//        let maxZombie = 1 + playerScore/10
+        let maxZombie = 1 + playerScore/10
         if let turrets = turrets {
             turrets.updateClosestZombie()
             turrets.turnTowardsClosestZombie()
         }
-//        if enemies.count < maxZombie {
-//            spawnZombie()
-//        }
+        if enemies.count < maxZombie {
+            spawnZombie()
+        }
         healthBar.size.height = CGFloat(playerLife)
         healthCounter.text = "Health: \(playerLife)"
         zombieScoreCounter.text = "x \(playerScore)"
@@ -431,7 +452,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
         if self.player.position.y > self.gameSpace.maxY - self.player.size.height * 8.75 {
             self.player.position.y = self.gameSpace.maxY - self.player.size.height * 8.75
-
         }
         if self.player.position.y < self.gameSpace.minY + self.player.size.height * -8.25 {
             self.player.position.y = self.gameSpace.minY + self.player.size.height * -8.25
@@ -440,7 +460,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func meleeAttack() {
         let meleeAttackAnimation: SKAction = SKAction(named: "MeleeAttack", duration: 0.5)!
         let melee = SKSpriteNode(imageNamed: "PlayerHit")
-        
         player.run(meleeAttackAnimation)
         melee.setScale(0.1)
         melee.size.height = melee.size.height + 90
@@ -465,7 +484,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func shotgunMelee() {
         let meleeAttackAnimation: SKAction = SKAction(named: "ShotgunMelee", duration: 0.5)!
         let melee = SKSpriteNode(imageNamed: "PlayerHit")
-        
         player.run(meleeAttackAnimation)
         melee.setScale(0.1)
         melee.size.height = melee.size.height + 90
@@ -489,13 +507,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     func pistolAttack() {
         let shootAttackAnimation: SKAction = SKAction(named: "ShootAttack", duration: 0.5)!
-        
         let bullet = SKSpriteNode(imageNamed: "Bullet")
         bullet.setScale(0.05)
         bullet.position = player.position
         bullet.zPosition = NodesZPosition.bullet.rawValue
         bullet.zRotation = player.zRotation
-        let action = SKAction.move(to: CGPoint(x: 1000 * cos(bullet.zRotation) + bullet.position.x, y: 1000 * sin(bullet.zRotation) + bullet.position.y), duration: 0.8)
+        let action = SKAction.move(to: CGPoint(x: 1000 * cos(bullet.zRotation) + bullet.position.x,
+                                               y: 1000 * sin(bullet.zRotation) + bullet.position.y),
+                                   duration: 0.8)
         let actionDone = SKAction.removeFromParent()
         bullet.run(SKAction.sequence([action,actionDone]))
         bullet.zRotation = player.zRotation + 4.75
@@ -512,13 +531,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     func shotgunAttack() {
         let shootAttackAnimation: SKAction = SKAction(named: "ShotgunAttack", duration: 0.5)!
-        
         let bullet = SKSpriteNode(imageNamed: "ShotGunFire")
         bullet.setScale(0.02)
         bullet.position = player.position
         bullet.zPosition = NodesZPosition.bullet.rawValue
         bullet.zRotation = player.zRotation
-        let action = SKAction.move(to: CGPoint(x: 100 * cos(bullet.zRotation) + bullet.position.x, y: 100 * sin(bullet.zRotation) + bullet.position.y), duration: 0.1)
+        let action = SKAction.move(to: CGPoint(x: 100 * cos(bullet.zRotation) + bullet.position.x,
+                                               y: 100 * sin(bullet.zRotation) + bullet.position.y),
+                                   duration: 0.1)
         let actionDone = SKAction.removeFromParent()
         bullet.run(SKAction.sequence([action,actionDone]))
         bullet.zRotation = player.zRotation + 4.75
@@ -540,7 +560,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     func dropLandmine() {
         let landmine = SKSpriteNode(imageNamed: "landmine")
-        
         landmine.setScale(0.1)
         landmine.position = player.position
         landmine.zPosition = NodesZPosition.landmine.rawValue
@@ -551,9 +570,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         landmine.physicsBody?.contactTestBitMask = BodyType.enemy.rawValue
         landmine.physicsBody?.collisionBitMask = BodyType.enemy.rawValue
         addChild(landmine)
-        landmines -= 1
     }
-
     func landmineExplode(landmineNode: SKNode) {
         let landMineExplosion = SKSpriteNode(imageNamed: "LandmineExplode")
         landMineExplosion.position = landmineNode.position
@@ -574,12 +591,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let delete = SKAction.removeFromParent()
         let explosionSequence = SKAction.sequence([scale, fadeOut, delete])
         landMineExplosion.run(explosionSequence)
-        
     }
     func zombieAttackProjectile(zombieNode: SKNode) {
         let zombieAttackAction: SKAction = SKAction(named: "ZombieAttack", duration: 1)!
         let melee = SKSpriteNode(imageNamed: "ZombieHit")
-        
         zombieNode.run(zombieAttackAction)
         melee.setScale(0.1)
         melee.size.width = melee.size.width + 30
@@ -588,7 +603,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         melee.zPosition = NodesZPosition.enemyMelee.rawValue
         melee.zRotation = zombieNode.zRotation
         melee.alpha = 0
-        let action = SKAction.move(to: CGPoint(x: 80 * cos(melee.zRotation) + melee.position.x, y: 80 * sin(melee.zRotation) + melee.position.y), duration: 0.1)
+        let action = SKAction.move(to: CGPoint(x: 80 * cos(melee.zRotation) + melee.position.x,
+                                               y: 80 * sin(melee.zRotation) + melee.position.y),
+                                   duration: 0.1)
         let actionDone = SKAction.removeFromParent()
         let actionDelay = SKAction.wait(forDuration: 0.3)
         let actionFadeIn = SKAction.fadeIn(withDuration: 0.1)
@@ -603,7 +620,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         melee.physicsBody?.contactTestBitMask = BodyType.player.rawValue | BodyType.playerHit.rawValue
         melee.physicsBody?.collisionBitMask = BodyType.player.rawValue | BodyType.playerHit.rawValue
         run(SKAction.playSoundFileNamed("ZombieAttack", waitForCompletion: false))
-
         addChild(melee)
     }
     func dropItem(node: SKNode) {
@@ -626,45 +642,41 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     private func keepEnemiesSeparated() {
-        // Assign constrain
         for enemy in enemies {
             enemy.constraints = []
             let distanceBetween = CGFloat(60)
             let constraint = SKConstraint.distance(SKRange(lowerLimit: distanceBetween), to: enemy)
             enemy.constraints!.append(constraint)
-
         }
     }
     func touchDown(atPoint pos : CGPoint) {
     }
-    
     func touchMoved(toPoint pos : CGPoint) {
     }
-    
     func touchUp(atPoint pos : CGPoint) {
     }
-    // ADDING TURRET HOPEFULLY IT WORKS
     private func towersShootEverySecond(turret: Turret) {
-        
         let action = SKAction.run {
-//            for bombTower in towerArray {
-        guard turret.closestZombie != nil else { return } // I haven't tested this guard statement yet.
+        guard turret.closestZombie != nil else { return }
         turret.addBulletThenShootAtClosestZOmbie()
-//            }
         }
         self.run(.repeatForever(.sequence([.wait(forDuration: 1), action])))
     }
+    private func spawnTurret(touch: UITouch) {
+        if (turrets == nil) {
+            let turret = Turret(imageNamed: "turret")
+            turret.position.x = touch.location(in: self).x
+            turret.position.y = touch.location(in: self).y
+            turret.zPosition = NodesZPosition.hero.rawValue
+            turrets = turret
+            towersShootEverySecond(turret: turrets!)
+            addChild(turrets!)
+            canPlaceTurret = false
+            turretTimer(target: turrets!)
+        }
+    }
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         for t in touches {
-            if (turrets == nil) {
-                let turret = Turret(imageNamed: "turret")
-                turret.position.x = t.location(in: self).x
-                turret.position.y = t.location(in: self).y
-                turret.zPosition = NodesZPosition.hero.rawValue
-                turrets = turret
-                towersShootEverySecond(turret: turrets!)
-                addChild(turret)
-            }
             self.touchDown(atPoint: t.location(in: self))
             if !gameOverStatus {
                 if shootButton.contains(t.location(in: self)) {
@@ -702,18 +714,35 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     if playerCanAttack {
                         if !shotgunEnabled {
                         player.texture = SKTexture(imageNamed: "survivor-idle_shotgun_0")
+                            swapButton.alpha = 0.4
                             shotgunEnabled = true
                         } else {
                             player.texture = SKTexture(imageNamed: "survivor-idle_handgun_0")
+                            swapButton.alpha = 1
                             shotgunEnabled = false
                         }
                     }
                 }
                 if landmineButton.contains(t.location(in: self)) {
-                    if landmines > 0 {
+                    if landmineEnabled {
                         landmineButton.alpha = 0.3
                         explosion = true
+                        landmineEnabled = false
                         dropLandmine()
+                    }
+                }
+                if canPlaceTurret && !turretButton.contains(t.location(in: self)) {
+                    spawnTurret(touch: t)
+                }
+                if turretButton.contains(t.location(in: self)) {
+                    if turretButtonEnabled {
+                        canPlaceTurret = true
+                        turretButtonEnabled = false
+                        turretButton.alpha = 0.3
+                    } else if !turretButtonEnabled && canPlaceTurret {
+                        turretButtonEnabled = true
+                        turretButton.alpha = 1
+                        canPlaceTurret = false
                     }
                 }
                 if pauseButton.contains(t.location(in: self)) {
@@ -727,22 +756,26 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                         pauseMenuPopUp()
                     }
                 }
-                if menuRestartButton.contains(t.location(in: self)) {
-                    gamePause = false
-                    self.view?.scene?.isPaused = false
-                    let newScene = GameScene.init(size: CGSize(width: displaySize.width, height: displaySize.height))
-                    newScene.scaleMode = .aspectFill
-                    self.view?.presentScene(newScene)
-                    pauseMenuPopUp()
-                }
-                if menuContinueButton.contains(t.location(in: self)) {
-                    gamePause = false
-                    self.view?.scene?.isPaused = false
-                    pauseMenuPopUp()
+                if gamePause {
+                    if menuRestartButton.contains(t.location(in: self)) {
+                        gamePause = false
+                        self.view?.scene?.isPaused = false
+                        let newScene = GameScene.init(size: CGSize(width: displaySize.width,
+                                                                   height: displaySize.height))
+                        newScene.scaleMode = .aspectFill
+                        self.view?.presentScene(newScene)
+                        pauseMenuPopUp()
+                    }
+                    if menuContinueButton.contains(t.location(in: self)) {
+                        gamePause = false
+                        self.view?.scene?.isPaused = false
+                        pauseMenuPopUp()
+                    }
                 }
             } else {
                 if restartButton.contains(t.location(in: self)){
-                    let newScene = GameScene.init(size: CGSize(width: displaySize.width, height: displaySize.height))
+                    let newScene = GameScene.init(size: CGSize(width: displaySize.width,
+                                                               height: displaySize.height))
                     newScene.scaleMode = .aspectFill
                     self.view?.presentScene(newScene)
                 }
@@ -750,30 +783,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-//        for t in touches {
-////            self.touchMoved(toPoint: t.location(in: self))
-////            let touchPoint = t.location(in: self)
-////            let previousTouchPoint = t.previousLocation(in: self)
-////            let aDX = touchPoint.x - previousTouchPoint.x
-////            let aDY = touchPoint.y - previousTouchPoint.y
-////
-////            player.position.x += aDX
-////            player.position.y += aDY
-//            
-//        }
     }
-    
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         for t in touches { self.touchUp(atPoint: t.location(in: self)) }
     }
-    
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         for t in touches { self.touchUp(atPoint: t.location(in: self)) }
     }
-    
     //MARK: Physics Contacts
     func didBegin(_ contact: SKPhysicsContact) {
-        
+    
         if (contact.bodyA.categoryBitMask == BodyType.enemy.rawValue && contact.bodyB.categoryBitMask == BodyType.bullet.rawValue) {
             if let index = enemies.index(where: {$0.name == contact.bodyA.node?.name}) {
                 contact.bodyA.node?.removeFromParent()
@@ -783,7 +802,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 enemies.remove(at: index)
                 playerScore += 1
                 dropItem(node: contact.bodyA.node!)
-
             }
         } else if (contact.bodyB.categoryBitMask == BodyType.enemy.rawValue && contact.bodyA.categoryBitMask == BodyType.bullet.rawValue) {
             if let index = enemies.index(where: {$0.name == contact.bodyB.node?.name}) {
@@ -794,7 +812,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 enemies.remove(at: index)
                 playerScore += 1
                 dropItem(node: contact.bodyB.node!)
-
             }
         }
         if (contact.bodyA.categoryBitMask == BodyType.enemy.rawValue && contact.bodyB.categoryBitMask == BodyType.playerHit.rawValue) {
@@ -818,8 +835,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 dropItem(node: contact.bodyB.node!)
             }
         }
-
-        
         if (contact.bodyA.categoryBitMask == BodyType.player.rawValue && contact.bodyB.categoryBitMask == BodyType.enemy.rawValue) {
             // Add timer to prevent spam
             if zombieCanAttackPlayer {
@@ -870,24 +885,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
         if (contact.bodyA.categoryBitMask == BodyType.landmine.rawValue && contact.bodyB.categoryBitMask == BodyType.enemy.rawValue) {
             if explosion {
-                landmineExplode(landmineNode: contact.bodyA.node!)
-                landmineButton.alpha = 1
                 explosion = false
+                landmineExplode(landmineNode: contact.bodyA.node!)
+                landmineTimer()
             }
             contact.bodyA.node?.removeFromParent()
-            if landmines == 0 {
-                landmines += 1
-            }
         } else if (contact.bodyB.categoryBitMask == BodyType.landmine.rawValue && contact.bodyA.categoryBitMask == BodyType.enemy.rawValue) {
             if explosion {
-                landmineExplode(landmineNode: contact.bodyB.node!)
-                landmineButton.alpha = 1
                 explosion = false
+                landmineExplode(landmineNode: contact.bodyB.node!)
+                landmineTimer()
             }
             contact.bodyB.node?.removeFromParent()
-            if landmines == 0 {
-                landmines += 1
-            }
         }
         if (contact.bodyA.categoryBitMask == BodyType.enemy.rawValue && contact.bodyB.categoryBitMask == BodyType.explosion.rawValue) {
             if let index = enemies.index(where: {$0.name == contact.bodyA.node?.name}) {
