@@ -4,28 +4,53 @@
 ZombieShooter is a top-down shooter that spawns random zombies that targets the player. The player has to survive by dodging the zombie attacks and fight back by shooting, melee or use a landmine. The goal is to survive as long as possible.
 ## Gifs
 
-Zombie Movement/Spawn and Player Shooting Action Demo
+Landmine
 
-![ZombieSpawnShooting](https://user-images.githubusercontent.com/7001720/54134550-930eaa00-43ee-11e9-92fc-f5f852d51c21.gif)
+![Landmine](https://user-images.githubusercontent.com/7001720/54206639-12fc4900-44af-11e9-8d32-de877a37b675.gif)
 
-Melee Action Demo
+Movement, Zombie Attack, DeathScreen
 
-![MeleeDemo](https://user-images.githubusercontent.com/7001720/54134431-593da380-43ee-11e9-9e92-702b43f5a35f.gif)
+![MovementZombieAttackDeathScreen](https://user-images.githubusercontent.com/7001720/54206674-260f1900-44af-11e9-8838-8d8a122581ce.gif)
 
-Landmine Demo
+Pause/Restart Menu
 
-![LandmineDemo](https://user-images.githubusercontent.com/7001720/54134371-3dd29880-43ee-11e9-900c-43b07bd7658f.gif)
+![PauseRestart](https://user-images.githubusercontent.com/7001720/54206715-3cb57000-44af-11e9-8e1a-e60806c5314a.gif)
 
-Game Over
+Shotgun Ammo Drop and Ammo Explosion
 
-![GameOverDemo](https://user-images.githubusercontent.com/7001720/54134255-08c64600-43ee-11e9-898c-db697bf45fc5.gif)
+![ShootingAmmoDropExplosion](https://user-images.githubusercontent.com/7001720/54206742-4ccd4f80-44af-11e9-9ef7-ba1cdeeecb69.gif)
+
+Shotgun Swap/ Shotgun Shot / Laser
+
+![ShotgunSwapShot](https://user-images.githubusercontent.com/7001720/54206788-6373a680-44af-11e9-959a-201630cbc972.gif)
+
+Shotgun Melee when out of Ammunition
+
+![ShotgunMelee](https://user-images.githubusercontent.com/7001720/54206833-78503a00-44af-11e9-9757-e42015ecff84.gif)
+
+Zombie spawn increase every 10 kills
+
+![ZombieSpawn](https://user-images.githubusercontent.com/7001720/54206869-89994680-44af-11e9-9bfc-19bd4751690a.gif)
 
 ## Features
+ 
+ Swap to shotgun which consumes shotgun ammo that can be dropped by zombies by chance.
+ 
+ Shotgun Ammo explodes when shot at.
+ 
+ Shotgun Melee animation when out of ammunition.
+ 
  Control the player with an analog joystick.
  
  Button to shoot(far-range attack), melee(close-range attack) and use landmine.
  
  Restart button for new game when health bar is depleted.
+ 
+ Pause menu with continue/restart option.
+ 
+ Zombie counter.
+ 
+ Zombie spawn increases after certain points.
  
  Sound added.
  
@@ -33,8 +58,6 @@ Game Over
 Hard coded for iPhone 7 Plus.
 
 ## Future Implementations
- 
- Add score
  
  Add turret (Auto targets closest zombie)
  
