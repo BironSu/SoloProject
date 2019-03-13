@@ -45,6 +45,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var playerScore = 0
     var playerLife = 200
     var landmineCoolDown = 15.0
+    var turretAmmo = 0
+    var turretTimer = Timer()
     override init(size: CGSize) {
         let maxRatio: CGFloat = 16.0/9.0
         let gameWidth = size.height/maxRatio
@@ -347,6 +349,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     @objc func turretExplode(tur: Timer) {
         if let target = tur.userInfo as? Turret {
             landmineExplode(landmineNode: target)
+            turrets = nil
+            target.removeAllActions()
             target.removeFromParent()
         }
         turretCoolDownTimer()
@@ -358,6 +362,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         turretButton.alpha = 1
         turretButtonEnabled = true
     }
+    private func towersShootEverySecondTimer(turret: Turret) {
+        turretTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(towersShootEverySecond(turret:)), userInfo: turret, repeats: true)
+    }
+    
     func zombieAttack() {
         let location = player.position
         for node in enemies {
@@ -655,12 +663,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     func touchUp(atPoint pos : CGPoint) {
     }
-    private func towersShootEverySecond(turret: Turret) {
-        let action = SKAction.run {
-        guard turret.closestZombie != nil else { return }
-        turret.addBulletThenShootAtClosestZOmbie()
+    @objc func towersShootEverySecond(turret: Timer) {
+        if turretAmmo > 0 {
+            turretAmmo -= 1
+            let turret = turret.userInfo as! Turret
+            let action = SKAction.run {
+                    guard turret.closestZombie != nil else { return }
+                    turret.addBulletThenShootAtClosestZOmbie()
+                }
+            self.run(action)
+        } else {
+            turretTimer.invalidate()
         }
-        self.run(.repeatForever(.sequence([.wait(forDuration: 1), action])))
     }
     private func spawnTurret(touch: UITouch) {
         if (turrets == nil) {
@@ -669,10 +683,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             turret.position.y = touch.location(in: self).y
             turret.zPosition = NodesZPosition.hero.rawValue
             turrets = turret
-            towersShootEverySecond(turret: turrets!)
-            addChild(turrets!)
-            canPlaceTurret = false
-            turretTimer(target: turrets!)
+            turretAmmo = 9
+            if let turrets = turrets {
+                addChild(turrets)
+                canPlaceTurret = false
+                towersShootEverySecondTimer(turret: turrets)
+                turretTimer(target: turrets)
+            }
         }
     }
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
