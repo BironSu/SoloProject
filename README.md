@@ -55,12 +55,10 @@ Zombie spawn increase every 10 kills
  Sound added.
  
 ## Requirements
-Hard coded for iPhone 7 Plus.
+Hard coded for iPhone 7 Plus... :)
 
 ## Future Implementations
- 
- Add turret (Auto targets closest zombie)
- 
+  
  Add boss zombie
  
- Add grenade (Drag and drop) 
+ Add high score
