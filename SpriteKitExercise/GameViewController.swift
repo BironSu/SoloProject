@@ -16,23 +16,22 @@ class GameViewController: UIViewController {
         let view = SKView()
         view.isMultipleTouchEnabled = true
         return view
-    }()    
+    }()
+    let displaySize: CGRect = UIScreen.main.bounds
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupViews()
+        setupMenuScene()
     }
-    func setupViews() {
+    func setupMenuScene() {
         view.addSubview(skView)
-        let displaySize: CGRect = UIScreen.main.bounds
         let displayWidth = displaySize.width
         let displayHeight = displaySize.height
+        let menuScene = MenuScene(size: CGSize(width: displayWidth, height: displayHeight))
         skView.frame = CGRect(x: 0.0, y: 0.0, width: displayWidth, height: displayHeight)
-        
-        let scene = GameScene.init(size: CGSize(width: displayWidth, height: displayHeight))
-        scene.scaleMode = .aspectFill
+        menuScene.scaleMode = .aspectFill
         skView.ignoresSiblingOrder = true
-//        skView.showsPhysics = true
-        skView.presentScene(scene)
+        skView.presentScene(menuScene)
     }
     override var shouldAutorotate: Bool {
         return true

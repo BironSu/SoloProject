@@ -14,6 +14,8 @@
 		937E731B2208AAB400ABC0F9 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937E731A2208AAB400ABC0F9 /* GameViewController.swift */; };
 		937E73202208AAB600ABC0F9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 937E731F2208AAB600ABC0F9 /* Assets.xcassets */; };
 		937E73232208AAB600ABC0F9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 937E73212208AAB600ABC0F9 /* LaunchScreen.storyboard */; };
+		93B51010223A98A600674D08 /* MenuScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93B5100F223A98A600674D08 /* MenuScene.swift */; };
+		93B51012223A9F6800674D08 /* EndScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93B51011223A9F6800674D08 /* EndScene.swift */; };
 		93D26DFC222EE62400181DE3 /* Turret.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93D26DFB222EE62400181DE3 /* Turret.swift */; };
 		93D26DFE2231AC5600181DE3 /* shader1.fsh in Resources */ = {isa = PBXBuildFile; fileRef = 93D26DFD2231AC5600181DE3 /* shader1.fsh */; };
 		93D26E042232F99900181DE3 /* ZombieSpawn.wav in Resources */ = {isa = PBXBuildFile; fileRef = 93D26DFF2232F99900181DE3 /* ZombieSpawn.wav */; };
@@ -36,6 +38,8 @@
 		937E731F2208AAB600ABC0F9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		937E73222208AAB600ABC0F9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		937E73242208AAB600ABC0F9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		93B5100F223A98A600674D08 /* MenuScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuScene.swift; sourceTree = "<group>"; };
+		93B51011223A9F6800674D08 /* EndScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EndScene.swift; sourceTree = "<group>"; };
 		93D26DFB222EE62400181DE3 /* Turret.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Turret.swift; sourceTree = "<group>"; };
 		93D26DFD2231AC5600181DE3 /* shader1.fsh */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.glsl; path = shader1.fsh; sourceTree = "<group>"; };
 		93D26DFF2232F99900181DE3 /* ZombieSpawn.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = ZombieSpawn.wav; sourceTree = "<group>"; };
@@ -100,6 +104,8 @@
 				93D26DFB222EE62400181DE3 /* Turret.swift */,
 				9350F5E7222997900066AF96 /* AnalogJoystick.swift */,
 				937E731A2208AAB400ABC0F9 /* GameViewController.swift */,
+				93B5100F223A98A600674D08 /* MenuScene.swift */,
+				93B51011223A9F6800674D08 /* EndScene.swift */,
 				937E731F2208AAB600ABC0F9 /* Assets.xcassets */,
 				9350739222272100000D5389 /* Sounds */,
 				937E73212208AAB600ABC0F9 /* LaunchScreen.storyboard */,
@@ -189,8 +195,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				93D26DFC222EE62400181DE3 /* Turret.swift in Sources */,
+				93B51012223A9F6800674D08 /* EndScene.swift in Sources */,
 				937E73192208AAB400ABC0F9 /* GameScene.swift in Sources */,
 				9350F5E8222997900066AF96 /* AnalogJoystick.swift in Sources */,
+				93B51010223A98A600674D08 /* MenuScene.swift in Sources */,
 				937E731B2208AAB400ABC0F9 /* GameViewController.swift in Sources */,
 				937E73132208AAB400ABC0F9 /* AppDelegate.swift in Sources */,
 			);
@@ -338,7 +346,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.pursuit.SpriteKitExercise;
+				PRODUCT_BUNDLE_IDENTIFIER = org.pursuit.ZombieShooter;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.2;
@@ -358,7 +366,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = org.pursuit.SpriteKitExercise;
+				PRODUCT_BUNDLE_IDENTIFIER = org.pursuit.ZombieShooter;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 4.2;

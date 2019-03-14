@@ -22,6 +22,7 @@ enum BodyType: UInt32 {
 enum NodesZPosition: CGFloat {
     case background, landmine, bullet, playerMelee, hero, enemy, enemyMelee, joystick , pauseMenuBackground, pauseMenuButton
 }
+// BEFORE YOU REVIEW MY CODE, YES IT IS MESSY, AND YES THERE IS MORE STUFF I WANT TO ADD.
 class GameScene: SKScene, SKPhysicsContactDelegate {
     var velocityMultiplier: CGFloat = 0.06
     let displaySize: CGRect = UIScreen.main.bounds
@@ -225,21 +226,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         sprite.alpha = 1
         return sprite
     }()
-    lazy var gameOverLogo: SKSpriteNode = {
-        let sprite = SKSpriteNode(imageNamed: "You'veDied")
-        sprite.zRotation = -1.55
-        sprite.zPosition = NodesZPosition.pauseMenuButton.rawValue
-        sprite.position = CGPoint(x: 25.0, y: 0.0)
-        return sprite
-    }()
-    lazy var restartButton: SKSpriteNode = {
-        let sprite = SKSpriteNode(imageNamed: "Restart")
-        sprite.setScale(0.3)
-        sprite.zRotation = -1.55
-        sprite.zPosition = NodesZPosition.pauseMenuButton.rawValue
-        sprite.position = CGPoint(x: -75.0, y: 0.0)
-        return sprite
-    }()
     lazy var zombieIcon: SKSpriteNode = {
         let sprite = SKSpriteNode(imageNamed: "ZombieImage")
         sprite.zPosition = NodesZPosition.joystick.rawValue
@@ -369,6 +355,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func zombieAttack() {
         let location = player.position
         for node in enemies {
+            // Add new duration formula to distance/speed instead of seconds.
             let followPlayer = SKAction.move(to: player.position, duration: 3)
             node.run(followPlayer)
             //Aim
@@ -384,10 +371,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     private func gameOver() {
-        gameOverStatus = true
-        addChild(pauseMenuBackground)
-        addChild(gameOverLogo)
-        addChild(restartButton)
+        analogJoystick.disabled = true
+        let displaySize: CGRect = UIScreen.main.bounds
+        let displayWidth = displaySize.width
+        let displayHeight = displaySize.height
+        let scene = EndScene.init(size: CGSize(width: displayWidth, height: displayHeight))
+        scene.scaleMode = .aspectFill
+        let reveal = SKTransition.doorsCloseVertical(withDuration: 0.5)
+        self.view?.presentScene(scene, transition: reveal)
     }
     override func didMove(to view: SKView) {
         setupNode()
@@ -431,12 +422,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addChild(analogJoystick)
         analogJoystick.trackingHandler = { [unowned self] data in
             self.player.position = CGPoint(x: self.player.position.x + (data.velocity.x * self.velocityMultiplier), y: self.player.position.y + (data.velocity.y * self.velocityMultiplier))
-            self.player.zRotation = data.angular + 1.5
+                self.player.zRotation = data.angular + 1.5
             // laser sights
             let _ = self.isTargetVisibleAtAngle(startPoint: self.player.position,
                                                 angle: self.player.zRotation,
                                                 distance: self.frame.size.height)
         }
+        
     }
     override func update(_ currentTime: TimeInterval) {
         let maxZombie = 1 + playerScore/10
@@ -585,8 +577,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         landMineExplosion.zPosition = NodesZPosition.joystick.rawValue
         landMineExplosion.setScale(0.1)
         landMineExplosion.zRotation = -1.5
-        let presetTexture = SKTexture(imageNamed: "LandmineExplode")
-        landMineExplosion.physicsBody = SKPhysicsBody(texture: presetTexture, size: landMineExplosion.size)
+//        let presetTexture = SKTexture(imageNamed: "LandmineExplode")
+//        landMineExplosion.physicsBody = SKPhysicsBody(texture: presetTexture, size: landMineExplosion.size)
+        landMineExplosion.physicsBody = SKPhysicsBody(circleOfRadius: 10)
         landMineExplosion.physicsBody?.categoryBitMask = BodyType.explosion.rawValue
         landMineExplosion.physicsBody?.contactTestBitMask = BodyType.enemy.rawValue
         landMineExplosion.physicsBody?.collisionBitMask = BodyType.enemy.rawValue
@@ -788,13 +781,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                         self.view?.scene?.isPaused = false
                         pauseMenuPopUp()
                     }
-                }
-            } else {
-                if restartButton.contains(t.location(in: self)){
-                    let newScene = GameScene.init(size: CGSize(width: displaySize.width,
-                                                               height: displaySize.height))
-                    newScene.scaleMode = .aspectFill
-                    self.view?.presentScene(newScene)
                 }
             }
         }
