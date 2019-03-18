@@ -8,7 +8,7 @@
 
 import SpriteKit
 class EndScene: SKScene {
-    
+    let highscore = UserDefaults.standard.object(forKey: "Highest Score") as! Int
     lazy var endSceneBackground: SKSpriteNode = {
         let background = SKSpriteNode(imageNamed: "ZombiePauseBackground")
         background.setScale(0.75)
@@ -17,19 +17,26 @@ class EndScene: SKScene {
         background.zPosition = NodesZPosition.pauseMenuBackground.rawValue
         return background
     }()
+    lazy var highScoreLabel: SKLabelNode = {
+        let label = SKLabelNode(text: "Highest Score: \(highscore) zombies killed")
+        label.zRotation = -1.55
+        label.position = CGPoint(x: size.width / 1.3, y: size.height / 2)
+        label.zPosition = NodesZPosition.pauseMenuBackground.rawValue
+        return label
+    }()
     lazy var restartButton: SKSpriteNode = {
         let sprite = SKSpriteNode(imageNamed: "Restart")
         sprite.setScale(0.3)
         sprite.zRotation = -1.55
         sprite.zPosition = NodesZPosition.pauseMenuButton.rawValue
-        sprite.position = CGPoint(x: size.width / 2.5, y: size.height / 2)
+        sprite.position = CGPoint(x: size.width / 3, y: size.height / 2)
         return sprite
     }()
     lazy var gameOverLogo: SKSpriteNode = {
         let sprite = SKSpriteNode(imageNamed: "You'veDied")
         sprite.zRotation = -1.55
         sprite.zPosition = NodesZPosition.pauseMenuButton.rawValue
-        sprite.position = CGPoint(x: size.width / 1.5, y: size.height / 2)
+        sprite.position = CGPoint(x: size.width / 2, y: size.height / 2)
         return sprite
     }()
     override init(size: CGSize) {
@@ -37,6 +44,7 @@ class EndScene: SKScene {
         addChild(endSceneBackground)
         addChild(gameOverLogo)
         addChild(restartButton)
+        addChild(highScoreLabel)
     }
     required init(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
