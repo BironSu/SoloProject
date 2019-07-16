@@ -794,40 +794,40 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func didBegin(_ contact: SKPhysicsContact) {
         if (contact.bodyA.categoryBitMask == BodyType.enemy.rawValue && contact.bodyB.categoryBitMask == BodyType.bullet.rawValue) {
             if let index = enemies.index(where: {$0.name == contact.bodyA.node?.name}) {
-                contact.bodyA.node?.removeFromParent()
-                contact.bodyB.node?.removeFromParent()
                 run(SKAction.playSoundFileNamed("ZombieDeath", waitForCompletion: false))
                 enemies.remove(at: index)
                 playerScore += 1
                 dropItem(node: contact.bodyA.node!)
+                contact.bodyA.node?.removeFromParent()
+                contact.bodyB.node?.removeFromParent()
             }
         } else if (contact.bodyB.categoryBitMask == BodyType.enemy.rawValue && contact.bodyA.categoryBitMask == BodyType.bullet.rawValue) {
             if let index = enemies.index(where: {$0.name == contact.bodyB.node?.name}) {
-                contact.bodyA.node?.removeFromParent()
-                contact.bodyB.node?.removeFromParent()
                 run(SKAction.playSoundFileNamed("ZombieDeath", waitForCompletion: false))
                 enemies.remove(at: index)
                 playerScore += 1
                 dropItem(node: contact.bodyB.node!)
+                contact.bodyA.node?.removeFromParent()
+                contact.bodyB.node?.removeFromParent()
             }
         }
         if (contact.bodyA.categoryBitMask == BodyType.enemy.rawValue && contact.bodyB.categoryBitMask == BodyType.playerHit.rawValue) {
             if let index = enemies.index(where: {$0.name == contact.bodyA.node?.name}) {
-                contact.bodyA.node?.removeFromParent()
-                contact.bodyB.node?.removeFromParent()
                 run(SKAction.playSoundFileNamed("ZombieDeath", waitForCompletion: false))
                 enemies.remove(at: index)
                 playerScore += 1
                 dropItem(node: contact.bodyA.node!)
+                contact.bodyA.node?.removeFromParent()
+                contact.bodyB.node?.removeFromParent()
             }
         } else if (contact.bodyB.categoryBitMask == BodyType.enemy.rawValue && contact.bodyA.categoryBitMask == BodyType.playerHit.rawValue) {
             if let index = enemies.index(where: {$0.name == contact.bodyB.node?.name}) {
-                contact.bodyB.node?.removeFromParent()
-                contact.bodyA.node?.removeFromParent()
                 run(SKAction.playSoundFileNamed("ZombieDeath", waitForCompletion: false))
                 enemies.remove(at: index)
                 playerScore += 1
                 dropItem(node: contact.bodyB.node!)
+                contact.bodyB.node?.removeFromParent()
+                contact.bodyA.node?.removeFromParent()
             }
         }
         if (contact.bodyA.categoryBitMask == BodyType.player.rawValue && contact.bodyB.categoryBitMask == BodyType.enemy.rawValue) {
@@ -910,11 +910,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             shotgunAmmo += 1
         }
         if (contact.bodyA.categoryBitMask == BodyType.items.rawValue && contact.bodyB.categoryBitMask == BodyType.bullet.rawValue) {
-            contact.bodyA.node?.removeFromParent()
             landmineExplode(landmineNode: contact.bodyA.node!)
+            contact.bodyA.node?.removeFromParent()
         } else if (contact.bodyB.categoryBitMask == BodyType.items.rawValue && contact.bodyA.categoryBitMask == BodyType.bullet.rawValue) {
-            contact.bodyB.node?.removeFromParent()
             landmineExplode(landmineNode: contact.bodyB.node!)
+            contact.bodyB.node?.removeFromParent()
         }
     }
 }
