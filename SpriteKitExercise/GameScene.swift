@@ -549,8 +549,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         landMineExplosion.zPosition = NodesZPosition.joystick.rawValue
         landMineExplosion.setScale(0.1)
         landMineExplosion.zRotation = -1.5
-        //        let presetTexture = SKTexture(imageNamed: "LandmineExplode")
-        //        landMineExplosion.physicsBody = SKPhysicsBody(texture: presetTexture, size: landMineExplosion.size)
         landMineExplosion.physicsBody = SKPhysicsBody(circleOfRadius: 10)
         landMineExplosion.physicsBody?.categoryBitMask = BodyType.explosion.rawValue
         landMineExplosion.physicsBody?.contactTestBitMask = BodyType.enemy.rawValue
@@ -798,7 +796,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             if let index = enemies.index(where: {$0.name == contact.bodyA.node?.name}) {
                 contact.bodyA.node?.removeFromParent()
                 contact.bodyB.node?.removeFromParent()
-                print("Zombie hit")
                 run(SKAction.playSoundFileNamed("ZombieDeath", waitForCompletion: false))
                 enemies.remove(at: index)
                 playerScore += 1
@@ -808,7 +805,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             if let index = enemies.index(where: {$0.name == contact.bodyB.node?.name}) {
                 contact.bodyA.node?.removeFromParent()
                 contact.bodyB.node?.removeFromParent()
-                print("Zombie hit")
                 run(SKAction.playSoundFileNamed("ZombieDeath", waitForCompletion: false))
                 enemies.remove(at: index)
                 playerScore += 1
@@ -819,7 +815,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             if let index = enemies.index(where: {$0.name == contact.bodyA.node?.name}) {
                 contact.bodyA.node?.removeFromParent()
                 contact.bodyB.node?.removeFromParent()
-                print("Zombie hit")
                 run(SKAction.playSoundFileNamed("ZombieDeath", waitForCompletion: false))
                 enemies.remove(at: index)
                 playerScore += 1
@@ -829,7 +824,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             if let index = enemies.index(where: {$0.name == contact.bodyB.node?.name}) {
                 contact.bodyB.node?.removeFromParent()
                 contact.bodyA.node?.removeFromParent()
-                print("Zombie hit")
                 run(SKAction.playSoundFileNamed("ZombieDeath", waitForCompletion: false))
                 enemies.remove(at: index)
                 playerScore += 1
@@ -853,7 +847,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
         if (contact.bodyA.categoryBitMask == BodyType.player.rawValue && contact.bodyB.categoryBitMask == BodyType.zombieHit.rawValue) {
             if zombieMissileCanHitPlayer {
-                print("Human hit")
                 run(SKAction.playSoundFileNamed("PlayerHit.wav", waitForCompletion: false))
                 playerLife -= 20
                 if playerLife <= 0 {
@@ -866,7 +859,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             }
         } else if (contact.bodyA.categoryBitMask == BodyType.zombieHit.rawValue && contact.bodyB.categoryBitMask == BodyType.player.rawValue) {
             if zombieMissileCanHitPlayer {
-                print("Human hit but 2nd line")
                 playerLife -= 20
                 if playerLife <= 0 {
                     contact.bodyB.node?.removeFromParent()
@@ -878,10 +870,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             }
         }
         if (contact.bodyA.categoryBitMask == BodyType.playerHit.rawValue && contact.bodyB.categoryBitMask == BodyType.zombieHit.rawValue) {
-            print("Counter!")
             contact.bodyB.node?.removeFromParent()
         } else if (contact.bodyA.categoryBitMask == BodyType.zombieHit.rawValue && contact.bodyB.categoryBitMask == BodyType.playerHit.rawValue) {
-            print("Counter!")
             contact.bodyA.node?.removeFromParent()
         }
         if (contact.bodyA.categoryBitMask == BodyType.landmine.rawValue && contact.bodyB.categoryBitMask == BodyType.enemy.rawValue) {
@@ -902,14 +892,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         if (contact.bodyA.categoryBitMask == BodyType.enemy.rawValue && contact.bodyB.categoryBitMask == BodyType.explosion.rawValue) {
             if let index = enemies.index(where: {$0.name == contact.bodyA.node?.name}) {
                 contact.bodyA.node?.removeFromParent()
-                print("\(contact.bodyA.node!.name!) exploded")
                 enemies.remove(at: index)
                 playerScore += 1
             }
         } else if (contact.bodyB.categoryBitMask == BodyType.enemy.rawValue && contact.bodyA.categoryBitMask == BodyType.explosion.rawValue) {
             if let index = enemies.index(where: {$0.name == contact.bodyB.node?.name}) {
                 contact.bodyB.node?.removeFromParent()
-                print("\(contact.bodyB.node!.name!) exploded")
                 enemies.remove(at: index)
                 playerScore += 1
             }
